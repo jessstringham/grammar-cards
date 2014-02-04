@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module DataStructures  
+module DataStructures
 ( Rule(..)
 , Situation(..)
 , Concept(..)

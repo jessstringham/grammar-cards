@@ -33,6 +33,7 @@
     - verb1
     - verb2
     - rest
+    conceptTrait: []
     situations:
     - situation: Normal
       front: <_subject> <_verb1> <_verb2> <_rest>
@@ -49,7 +50,7 @@
   - concept: Regular Verbs
     wordlist:
     - present_tense
-    conceptTraits: 
+    conceptTrait: 
     - TranslateEachWord
     situations:
     - situation: Present Tense
@@ -66,14 +67,14 @@
       front: <_present_tense> (infinitive)
       rules:
       - rule: ar verbs
-        back: <present_tense>^-r
+        back: <present_tense>||-r|
       - rule: er verbs
         back: <present_tense>|-er|+a|
   - concept: Irregular Verbs
-    conceptTraits: 
+    conceptTrait: 
     - TranslateEachWord # Goes through each word in word list and creates seperate situations for each.
     wordlist:
     - infinitive
     - present_tense
     - past_tense
-
+    situations: []

@@ -1,9 +1,9 @@
 
 import qualified Data.ByteString.Char8 as BS
 import Data.Yaml
-import DataStructures
+import Definitions
 import System.Environment
-
+import YamlParsers
 
 checkEither :: Either [Char] t -> t
 checkEither (Left err)= error err

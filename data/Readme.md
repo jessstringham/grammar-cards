@@ -54,11 +54,14 @@ Template
 
 S -> [a-Z ()]S   # We might have a bunch of words and spaces. Consume!
 S -> |X|X|S      # We've reached a modification rule!
+S -> <W>S        # We've reached a word!
+S -> <_W>S       # We've reached a translation!
+S -> ε           # We are done.
+
+
 X -> [a-z]?X     # Rules may have a question mark after each letter
 X -> [a-z]X      # Rules are case insensitive
-S -> <W>S        # We've reached a translated word!
 W -> [a-Z]+      # Translated words can only contain a-Z with no spaces
-S -> ε           # We are done.
 
 | <word> | Replaced by that "word" from the wordset |
 | \|x\|y\| | remove x letters. add y letters |

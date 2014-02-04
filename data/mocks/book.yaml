@@ -1,0 +1,12 @@
+- section: Nouns
+  concepts:
+  - concept: Nouns
+    wordlist:
+    - noun
+    conceptTrait: []
+    situations:
+    - situation: Translation
+      front: <_noun>
+      rules:
+      - rule: default
+        back: <noun>

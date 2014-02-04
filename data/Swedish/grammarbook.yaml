@@ -1,0 +1,79 @@
+---
+- section: Nouns
+  concepts:
+  - concept: Nouns
+    wordlist: # each of these have an implicit translation value of _word
+    - noun
+    conceptTrait: []
+    situations:
+    - situation: Translation # This is created by default if you use Translation concept trait, but you can also override it.
+      front: <_noun>
+      rules:
+      - rule: default # If we look up a rule and fail, we fall back on default
+        back: <noun>
+    - situation: Indefinite Article
+      front: (a <_noun>)
+      rules:
+      - rule: en
+        back: en <noun>
+      - rule: ett
+        back: ett <noun>
+    - situation: Definite Article
+      front: (the <_noun>)
+      rules:
+      - rule: en
+        back: <noun>en # naive for now
+      - rule: ett
+        back: <noun>ett
+- section: Sentences
+  concepts:
+  - concept: Commands and clauses with more than one verb
+    wordlist:
+    - subject
+    - verb1
+    - verb2
+    - rest
+    situations:
+    - situation: Normal
+      front: <_subject> <_verb1> <_verb2> <_rest>
+      rules:
+      - rule: default
+        back: <subject> <verb1> <verb2> <rest>
+    - situation: Question
+      front: <_verb1> <subject> <_verb2> <_rest>
+      rules:
+      - rule: default
+        back: <verb1> <subject> <verb2> <rest>
+- section: Verbs
+  concepts:
+  - concept: Regular Verbs
+    wordlist:
+    - present_tense
+    conceptTraits: 
+    - TranslateEachWord
+    situations:
+    - situation: Present Tense
+      front: <_present_tense> (present tense)
+      rules:
+      - rule: default
+        back: <present_tense>
+    - situation: Past Tense
+      front: <_present_tense> (past tense)
+      rules:
+      - rule: default
+        back: <present_tense>|-r?|+de|
+    - situation: Past Tense
+      front: <_present_tense> (infinitive)
+      rules:
+      - rule: ar verbs
+        back: <present_tense>^-r
+      - rule: er verbs
+        back: <present_tense>|-er|+a|
+  - concept: Irregular Verbs
+    conceptTraits: 
+    - TranslateEachWord # Goes through each word in word list and creates seperate situations for each.
+    wordlist:
+    - infinitive
+    - present_tense
+    - past_tense
+

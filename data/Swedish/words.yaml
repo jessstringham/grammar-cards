@@ -1,0 +1,39 @@
+---
+- section: Nouns
+  concept: Nouns
+  words:
+  - wordset:
+    - name: noun
+      word: bil
+      translation: car
+    rule: en
+    exceptions: []
+  - wordset:
+    - name: noun
+      word: bok
+      translation: book
+    rule: en
+    exceptions:
+    - situation: Indefinite Plural
+      wordset:
+      - name: noun
+        word: bocker
+        translation: DEFAULT
+- section: Sentences
+  concept: Commands and clauses with more than one verb
+  words:
+  - wordset:
+    - name: subject
+      word: hon
+      translation: she
+    - name: verb1
+      word: vill
+      translation: wants
+    - name: verb2
+      word: äta
+      translation: to eat
+    - name: rest
+      word: choklad
+      translation: chocolate
+    rule: DEFAULT
+    exceptions: []

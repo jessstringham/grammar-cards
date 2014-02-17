@@ -11,8 +11,14 @@ checkEither (Right dataThing) = dataThing
 
 main :: IO ()
 main = do
-    book_location:_ <- getArgs
-    yamlData <- BS.readFile book_location
-    let stuff = Data.Yaml.decodeEither yamlData :: Either String Book
-    let book = checkEither stuff
-    putStrLn $ show book
+    bookLocation:wordsLocation:_ <- getArgs
+
+    yamlData <- BS.readFile bookLocation
+    let book_data = Data.Yaml.decodeEither yamlData :: Either String BookYaml
+    let book = checkEither book_data
+    putStrLn (show book)
+    
+    yamlData <- BS.readFile wordsLocation
+    let wordsData = Data.Yaml.decodeEither yamlData :: Either String ExamplesYaml
+    let words = checkEither wordsData
+    putStrLn $ show words

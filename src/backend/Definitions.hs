@@ -1,31 +1,59 @@
-
+-- This file, along with YamlParsers, can help read a human-generated 
+-- yaml files, and 
 module Definitions
-( Rule(..)
-, Situation(..)
-, Concept(..)
-, Section(..)
-, Book(..)
+( RuleYaml(..)
+, SituationYaml(..)
+, ConceptYaml(..)
+, SectionYaml(..)
+, BookYaml(..)
+, WordYaml(..)
+, ExceptionYaml(..)
+, WordInfoYaml(..)
+, GroupYaml(..)
+, ExamplesYaml(..)
 ) where 
 
-data Rule = Rule { rule :: String
-                 , back :: String} deriving (Show, Eq)
+data RuleYaml = RuleYaml { rule :: String
+                         , back :: String} deriving (Show, Eq)
 
 
-data Situation = Situation { situation :: String
-                           , front :: String
-                           , rules :: [Rule]} deriving (Show, Eq)
+data SituationYaml = SituationYaml { situation :: String
+                                   , front :: String
+                                   , rules :: [RuleYaml]} deriving (Show, Eq)
 
 
-data Concept = Concept { concept :: String
-                       , wordlist :: [String]
-                       , conceptTrait :: [String]
-                       , situations :: [Situation]
-                       } deriving (Show, Eq)
+data ConceptYaml = ConceptYaml { concept :: String
+                               , wordlist :: [String]
+                               , conceptTrait :: [String]
+                               , situations :: [SituationYaml]
+                               } deriving (Show, Eq)
 
 
-data Section = Section { section :: String
-                       , concepts :: [Concept]
-                       } deriving (Show, Eq)
+data SectionYaml = SectionYaml { section :: String
+                               , concepts :: [ConceptYaml]
+                               } deriving (Show, Eq)
 
 
-type Book = [Section]
+type BookYaml = [SectionYaml]
+
+
+data WordYaml = WordYaml { label :: String
+                         , word :: String
+                         , translation :: String
+                         } deriving (Show, Eq)
+
+data ExceptionYaml = ExceptionYaml { situationRef :: String
+                                   , words :: [WordYaml]
+                                   } deriving (Show, Eq)
+
+data WordInfoYaml = WordInfoYaml { wordInfo :: [WordYaml]
+                                 , ruleRef :: String
+                                 , exceptions :: [ExceptionYaml]
+                                 } deriving (Show, Eq)
+
+data GroupYaml = GroupYaml { sectionRef :: String
+                           , conceptRef :: String
+                           , wordsInfo :: [WordInfoYaml]
+                           } deriving (Show, Eq)
+
+type ExamplesYaml = [GroupYaml]

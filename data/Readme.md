@@ -75,4 +75,32 @@ present_tense = pratar
 
 pratar -> prata -> pratade
 
+Words Yaml
+==========
+
+List of groups
+
+Group
+-----
+
+| section | String | name of section. should match grammar book. |
+| concept | String | name of concept. should match grammar book. |
+| words | [Words] | list of words |
+
+WordList
+--------
+| wordset | [Word] | |
+| rule | Name | rule, matching a rule name from grammarbook |
+| exceptions | [Exception] ||
+
+Exception
+----------
+| situation | Name ||
+| new_wordset | [Word] | target-language string |
+
+Word
+----
+| name | Name ||
+| word | String | the target-language string |
+| translations | String | English string |
 

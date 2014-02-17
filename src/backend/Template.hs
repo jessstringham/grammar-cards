@@ -1,11 +1,15 @@
-
-
+module Template
+( Expr(..)
+, RemoveThis(..)
+, AddThis(..)
+, OptionalChar(..)
+) where
 
 
 --data Template = Template { raw_rule :: String
 --                       , apply_rule :: Maybe 
 
-data Expr = Word String 
+data Expr = WordText String 
           | PlaceHolder String Bool
           | StringModifier RemoveThis AddThis
           deriving (Show)
@@ -27,7 +31,7 @@ maybeAttachWord word rest =
     if word == "" then 
         rest
     else
-        (Word $ reverse word):rest
+        (WordText $ reverse word):rest
 
 parseSentenceString' :: RawTemplate -> String -> [Expr]
 parseSentenceString' [] [] = []
@@ -81,9 +85,3 @@ getAddRule' (letter:rest) parsedTextProgress
         ((AddThis $ reverse parsedTextProgress), rest)
     | otherwise =
         getAddRule' rest (letter:parsedTextProgress)
-
-
-
-
-
-

@@ -1,0 +1,8 @@
+TODO
+
+
+ - Optional fields in Yaml
+ - Field to suggest things
+ - Have hierarchy for rules?
+ - have a way to sync up IDs (between word list)
+ - Variable yaml field name?

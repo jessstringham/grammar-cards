@@ -1,12 +1,45 @@
 module Book
-( WordSet(..)
-, WordInfo(..)
+( WordInfo(..)
 , WordString(..)
+, Book(..)
+, Concept(..)
+, emptyConcept
+, Situation(..)
+, Rule(..)
+, TemplateFun(..)
+, Example(..)
+, Exception(..)
 ) where
 
+import Template
 import Data.List
 
-type WordName = String
+{- SHARED -}
+
+-- Should I use Maybe here?
+data WordString = Word String | Undefined deriving (Show, Eq)
+
+data WordInfo = WordInfo { wordName :: String
+                         , word :: WordString
+                         , translation :: WordString
+                         } deriving (Show, Eq)
+
+
+{- WORDS -}
+
+data Exception = Exception { situationRules :: String 
+                           , replacementWords :: [WordInfo]
+                           } deriving (Show, Eq)
+
+data Example = Example { wordSet :: [WordInfo]
+                       , ruleRef :: String
+                       , exceptions :: [Exception]
+                       } deriving (Show, Eq)
+
+
+
+{- BOOK -}
+
 
 {-
 This will either have a template we can interpret and apply the rule to a wordset, 
@@ -14,54 +47,10 @@ or refer to the Default function, or point out that it is undefined.
 -} 
 data TemplateFun = TemplateUndefined 
                  | DefaultTemplate
-                 | Template String
+                 | Template RawTemplate
                  deriving (Show, Eq)
 
-
-type Book = [Concept]
-
-data Concept = Concept { concept :: String
-                       , section :: String
-                       , situations :: [Situation]
-                       , rules :: [Rule]
-                       , requiredWords :: [WordName]
-                       , words :: [WordInfo]
-                       } deriving (Show, Eq)
-
-emptyConcept :: Concept
-emptyConcept = Concept [] [] [] []
-
--- Should I use Maybe here?
-data WordString = Word String | Undefined deriving (Show, Eq)
-
-data WordInfo = WordInfo { wordName :: WordName
-                         , word :: WordString
-                         , translation :: WordString
-                         } deriving (Show, Eq)
-
-type WordSet = [WordInfo]
-
-newWordSetFromConcept :: Concept -> WordSet
-newWordSetFromConcept concept =
-    map (\n -> WordInfo n Undefined Undefined) (requiredWords concept)
-
-checkForNoUndefined :: WordInfo -> Bool
-checkForNoUndefined wordInfo = 
-    ((word wordInfo) /= Undefined) && ((translation wordInfo) /= Undefined)
-
-checkAllWordsForNoUndefined :: WordSet -> Bool
-checkAllWordsForNoUndefined wordInfos =
-    foldl (\x -> \y -> x && (checkForNoUndefined y)) True wordInfos
-
-data WordRule = WordRule { wordSet :: WordSet
-                         , situationRules :: (SituationName, RuleName) 
-                         } deriving (Show, Eq)
-
-
-type RuleName = String
-type SituationName = String
-
-data Situation = Situation { situationName :: SituationName
+data Situation = Situation { situationName :: String
                            , front :: TemplateFun
                            } deriving (Show, Eq)
 
@@ -69,10 +58,37 @@ data Situation = Situation { situationName :: SituationName
 While rules may share ruleName's (that's how you group them!) and
 situationRef's, they shouldn't share both a ruleName and situationRef.
 -}
-data Rule = Rule { ruleName :: RuleName
-                 , situationRef :: SituationName
+data Rule = Rule { ruleName :: String
+                 , situationRef :: String
                  , back :: TemplateFun
                  } deriving (Show, Eq)
+
+data Concept = Concept { concept :: String
+                       , section :: String
+                       , situations :: [Situation]
+                       , rules :: [Rule]
+                       , requiredWords :: [String]
+                       , examples :: [Example]
+                       } deriving (Show, Eq)
+
+emptyConcept :: Concept
+emptyConcept = Concept "" "" [] [] [] []
+
+type Book = [Concept]
+
+newWordSetFromStrings :: [String] -> [WordInfo]
+newWordSetFromStrings wordlist =
+    map (\n -> WordInfo n Undefined Undefined) wordlist
+
+checkForNoUndefined :: WordInfo -> Bool
+checkForNoUndefined wordInfo = 
+    ((word wordInfo) /= Undefined) && ((translation wordInfo) /= Undefined)
+
+checkAllWordsForNoUndefined :: [WordInfo] -> Bool
+checkAllWordsForNoUndefined wordInfos =
+    foldl (\x -> \y -> x && (checkForNoUndefined y)) True wordInfos
+
+
 
 -- Returns True if all is well
 checkUniqueRules :: [Rule] -> Bool

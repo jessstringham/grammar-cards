@@ -1,10 +1,14 @@
+module Expr
+( functionFromExpr
+) where
+
 import Template
 import Book
 
 extractWord (Word word) = word
 extractWord a = error "Undefined! " ++ (show a)
 
-lookupWordSetWord :: WordSet -> String -> Bool -> String
+lookupWordSetWord :: [WordInfo] -> String -> Bool -> String
 lookupWordSetWord ws name isTranslation = 
 	let wordSetWord = (head (filter (\x -> (name == (wordName x))) ws)) in
 	if isTranslation then
@@ -14,14 +18,18 @@ lookupWordSetWord ws name isTranslation =
 
 -- This takes a template and returns a function that will convert a
 -- wordset to a string
-functionFromExpr :: [Expr] -> WordSet -> String -> String
-functionFromExpr [] _ accum = accum
-functionFromExpr ((PlaceHolder name bool):rest) wordset accum = 
-	accum ++ (functionFromExpr rest wordset $ lookupWordSetWord wordset name bool)
-functionFromExpr ((StringModifier removeThis addThis):rest) wordset accum = 
-	functionFromExpr rest wordset $ addCharacters addThis $ removeSomeCharacters removeThis accum
-functionFromExpr ((WordText text):rest) wordset accum = 
-	functionFromExpr rest wordset (text ++ accum)
+
+functionFromExpr :: [Expr] -> [WordInfo] -> String
+functionFromExpr a b = functionFromExpr' a b ""
+
+functionFromExpr' :: [Expr] -> [WordInfo] -> String -> String
+functionFromExpr' [] _ accum = accum
+functionFromExpr' ((PlaceHolder name bool):rest) wordset accum = 
+	accum ++ (functionFromExpr' rest wordset $ lookupWordSetWord wordset name bool)
+functionFromExpr' ((StringModifier removeThis addThis):rest) wordset accum = 
+	functionFromExpr' rest wordset $ addCharacters addThis $ removeSomeCharacters removeThis accum
+functionFromExpr' ((WordText text):rest) wordset accum = 
+	functionFromExpr' rest wordset (accum ++ text)
 
 addCharacters :: AddThis -> String -> String
 addCharacters (AddThis addThis) accum =
@@ -51,5 +59,5 @@ tests =
 	let template1 = [WordText "jag "
 	                , PlaceHolder "noun" False
 	                , StringModifier (RemoveThis [OptionalChar 'r' True]) (AddThis "dde")] in
-	functionFromExpr template1 example1 ""
+	functionFromExpr template1 example1
 

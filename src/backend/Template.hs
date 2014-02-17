@@ -3,6 +3,8 @@ module Template
 , RemoveThis(..)
 , AddThis(..)
 , OptionalChar(..)
+, parseSentenceString
+, RawTemplate(..)
 ) where
 
 

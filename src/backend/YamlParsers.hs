@@ -8,27 +8,27 @@ import Control.Monad
 import Control.Applicative
 import Data.Yaml
 import qualified Data.ByteString.Char8 as BS
-import Definitions
+import qualified YamlBook as Yaml
 
 
-instance FromJSON RuleYaml where
-    parseJSON (Object v) = RuleYaml <$> 
+instance FromJSON Yaml.Rule where
+    parseJSON (Object v) = Yaml.Rule <$> 
                          v  .: "rule" <*>
                          v  .: "back"
 
     parseJSON _          = mzero
 
 
-instance FromJSON SituationYaml where
-    parseJSON (Object v) = SituationYaml <$> 
+instance FromJSON Yaml.Situation where
+    parseJSON (Object v) = Yaml.Situation <$> 
                          v  .: "situation" <*>
                          v  .: "front" <*>
                          v  .: "rules"
 
     parseJSON _          = mzero
 
-instance FromJSON ConceptYaml where
-    parseJSON (Object v) = ConceptYaml <$> 
+instance FromJSON Yaml.Concept where
+    parseJSON (Object v) = Yaml.Concept <$> 
                          v  .: "concept" <*>
                          v  .: "wordlist" <*>
                          v  .: "conceptTrait" <*>
@@ -36,30 +36,30 @@ instance FromJSON ConceptYaml where
 
     parseJSON _          = mzero
 
-instance FromJSON SectionYaml where
-    parseJSON (Object v) = SectionYaml <$> 
+instance FromJSON Yaml.Section where
+    parseJSON (Object v) = Yaml.Section <$> 
                          v  .: "section" <*>
                          v  .: "concepts"
 
     parseJSON _          = mzero
 
-instance FromJSON WordYaml where
-    parseJSON (Object v) = WordYaml <$> 
+instance FromJSON Yaml.Word where
+    parseJSON (Object v) = Yaml.Word <$> 
                          v  .: "name" <*>
                          v  .: "word" <*>
                          v  .: "translation"
 
     parseJSON _          = mzero
 
-instance FromJSON ExceptionYaml where
-    parseJSON (Object v) = ExceptionYaml <$> 
+instance FromJSON Yaml.Exception where
+    parseJSON (Object v) = Yaml.Exception <$> 
                          v  .: "situation" <*>
                          v  .: "wordset"
 
     parseJSON _          = mzero
 
-instance FromJSON WordInfoYaml where
-    parseJSON (Object v) = WordInfoYaml <$> 
+instance FromJSON Yaml.WordInfo where
+    parseJSON (Object v) = Yaml.WordInfo <$> 
                          v  .: "wordset" <*>
                          v  .: "rule" <*>
                          v  .: "exceptions"
@@ -67,8 +67,8 @@ instance FromJSON WordInfoYaml where
     parseJSON _          = mzero
 
 
-instance FromJSON GroupYaml where
-    parseJSON (Object v) = GroupYaml <$> 
+instance FromJSON Yaml.Group where
+    parseJSON (Object v) = Yaml.Group <$> 
                          v  .: "section" <*>
                          v  .: "concept" <*>
                          v  .: "words"

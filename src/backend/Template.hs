@@ -7,10 +7,6 @@ module Template
 , RawTemplate(..)
 ) where
 
-
---data Template = Template { raw_rule :: String
---                       , apply_rule :: Maybe 
-
 data Expr = WordText String 
           | PlaceHolder String Bool
           | StringModifier RemoveThis AddThis
@@ -28,7 +24,6 @@ parseRuleString = parseSentenceString
 parseSentenceString :: RawTemplate -> [Expr]
 parseSentenceString text = parseSentenceString' text []
 
-
 maybeAttachWord word rest =
     if word == "" then 
         rest
@@ -40,20 +35,18 @@ parseSentenceString' [] [] = []
 parseSentenceString' [] word = maybeAttachWord word []
 parseSentenceString' (first:rest) word
     | first == '|' = 
-        let (expressions, remaining) = getStringModifier rest in
-            maybeAttachWord word (expressions:(parseSentenceString remaining))
+            maybeAttachWord word (mod_exprs:parseSentenceString mod_remaining)
     | first == '<' =
-        let (expressions, remaining) = getPlaceHolder rest in
-            maybeAttachWord word (expressions:(parseSentenceString remaining))
+            maybeAttachWord word (ph_exprs:parseSentenceString ph_remaining)
     | otherwise =
         parseSentenceString' rest (first:word)
-
-
+  where (mod_exprs, mod_remaining) = getStringModifier rest
+        (ph_exprs, ph_remaining) = getPlaceHolder rest
 
 getPlaceHolder :: RawTemplate -> (Expr, RawTemplate)
 getPlaceHolder whole@(letter:rest)
-    | letter == '_' = (getPlaceHolder' rest [] True)
-    | otherwise = (getPlaceHolder' whole [] False)
+    | letter == '_' = getPlaceHolder' rest [] True
+    | otherwise = getPlaceHolder' whole [] False
 
 getPlaceHolder' :: RawTemplate -> String -> Bool -> (Expr, RawTemplate)
 getPlaceHolder' (letter:rest) parsedText translation
@@ -62,21 +55,20 @@ getPlaceHolder' (letter:rest) parsedText translation
     | otherwise =
         getPlaceHolder' rest (letter:parsedText) translation
 
-
 getStringModifier :: RawTemplate -> (Expr, RawTemplate)
 getStringModifier rest = getRemoveRule rest []
 
 getRemoveRule :: RawTemplate -> [OptionalChar] -> (Expr, RawTemplate)
 getRemoveRule (letter:next:rest) parsedText
     | letter == '|' = 
-        let (addRule, remaining) = getAddRule (next:rest) in
-            ((StringModifier (RemoveThis $ reverse parsedText) addRule), remaining)
+        (StringModifier (RemoveThis $ reverse parsedText) add_rule, remaining)
     | next == '?' = 
-        let parsedTextProgress = (OptionalChar letter True):parsedText in
-            getRemoveRule rest parsedTextProgress
+            getRemoveRule rest opt_parsed_text
     | otherwise =
-        let parsedTextProgress = (OptionalChar letter False):parsedText in
-            getRemoveRule (next:rest) parsedTextProgress
+            getRemoveRule (next:rest) req_parsed_text
+  where (add_rule, remaining) = getAddRule (next:rest)
+        opt_parsed_text = OptionalChar letter True:parsedText
+        req_parsed_text = OptionalChar letter False:parsedText
 
 getAddRule :: RawTemplate -> (AddThis, RawTemplate)
 getAddRule text = getAddRule' text ""
@@ -84,6 +76,6 @@ getAddRule text = getAddRule' text ""
 getAddRule' :: RawTemplate -> String -> (AddThis, RawTemplate)
 getAddRule' (letter:rest) parsedTextProgress 
     | letter == '|' =
-        ((AddThis $ reverse parsedTextProgress), rest)
+        (AddThis $ reverse parsedTextProgress, rest)
     | otherwise =
         getAddRule' rest (letter:parsedTextProgress)

@@ -27,6 +27,7 @@ instance FromJSON Yaml.Situation where
 
     parseJSON _          = mzero
 
+
 instance FromJSON Yaml.Concept where
     parseJSON (Object v) = Yaml.Concept <$> 
                          v  .: "concept" <*>
@@ -36,12 +37,14 @@ instance FromJSON Yaml.Concept where
 
     parseJSON _          = mzero
 
+
 instance FromJSON Yaml.Section where
     parseJSON (Object v) = Yaml.Section <$> 
                          v  .: "section" <*>
                          v  .: "concepts"
 
     parseJSON _          = mzero
+
 
 instance FromJSON Yaml.Word where
     parseJSON (Object v) = Yaml.Word <$> 
@@ -51,12 +54,14 @@ instance FromJSON Yaml.Word where
 
     parseJSON _          = mzero
 
+
 instance FromJSON Yaml.Exception where
     parseJSON (Object v) = Yaml.Exception <$> 
                          v  .: "situation" <*>
                          v  .: "wordset"
 
     parseJSON _          = mzero
+
 
 instance FromJSON Yaml.WordInfo where
     parseJSON (Object v) = Yaml.WordInfo <$> 
@@ -74,4 +79,3 @@ instance FromJSON Yaml.Group where
                          v  .: "words"
 
     parseJSON _          = mzero
-

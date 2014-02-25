@@ -18,21 +18,23 @@ data Card = Card
 
 data CardGenerator = CardGenerator 
     { generator :: [WordInfo] -> Card
-    , cardRuleRef :: String 
-    , cardSituation :: String }
+    , cardGenRuleRef :: String 
+    , cardGenSituationRef :: String }
 instance Show CardGenerator where
-    show x = cardRuleRef x ++ cardSituation x
+    show x = cardGenRuleRef x ++ cardGenSituationRef x
+
+handleCardSide :: TemplateFun -> [WordInfo] -> String
+handleCardSide DefaultTemplate _ = error "Not Implemented!"
+handleCardSide TemplateUndefined _ = error "This side is undefined"
+handleCardSide (Template template) wordinfo =
+    functionFromExpr (parseRuleString template) wordinfo
 
 -- todo Default template!
 cardGeneratorFunction :: TemplateFun -> TemplateFun -> [WordInfo] -> Card
-cardGeneratorFunction TemplateUndefined _ _ = error "Front is undefined!"
-cardGeneratorFunction DefaultTemplate _ _ = error "Not implemented!"
-cardGeneratorFunction (Template _) TemplateUndefined _ = error "Back is undefined!"
-cardGeneratorFunction (Template _) DefaultTemplate _ = error "Not implemented!"
-cardGeneratorFunction (Template frontTemplate) (Template backTemplate) wordinfo =
-    Card
-        ((functionFromExpr $ parseRuleString frontTemplate) wordinfo)
-        ((functionFromExpr $ parseRuleString backTemplate) wordinfo)
+cardGeneratorFunction frontTemplate backTemplate wordinfo =
+    Card 
+        (handleCardSide frontTemplate wordinfo) 
+        (handleCardSide backTemplate wordinfo)
 
 cardGeneratorGenerator :: Situation -> Rule -> CardGenerator
 cardGeneratorGenerator situation rule =
@@ -50,7 +52,7 @@ buildCardGenerator situation rawRules =
   where filtered_rules = filter (\r -> situationName situation == situationRef r) rawRules
 
 filterCardsByRule :: String -> [CardGenerator] -> [CardGenerator]
-filterCardsByRule ruleref = filter (\c -> cardRuleRef c == ruleref)
+filterCardsByRule ruleref = filter (\c -> cardGenRuleRef c == ruleref)
 
 -- todo
 applyCardGeneratorsToExample :: [CardGenerator] -> Example -> [Card]

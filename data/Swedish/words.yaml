@@ -16,7 +16,7 @@
     exceptions:
     - situation: Indefinite Plural
       wordset:
-      - name: noun
+        name: noun
         word: bocker
         translation: DEFAULT
 - section: Sentences

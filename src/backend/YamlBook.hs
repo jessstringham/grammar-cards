@@ -94,7 +94,7 @@ instance FromJSON Word where
 
 data Exception = Exception 
     { situationRef :: String
-    , words :: [Word]
+    , words :: Word
     } deriving (Show, Eq)
 
 instance FromJSON Exception where

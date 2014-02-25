@@ -6,6 +6,7 @@ module CardGenerator
 ) where
 
 import Control.Exception.Base()
+import Data.Maybe
 
 import Book
 import Expr
@@ -14,7 +15,9 @@ import Template
 -- todo add tags and stuff
 data Card = Card 
     { cardFront :: String
-    , cardBack :: String } deriving (Show, Eq)
+    , cardBack :: String 
+    , cardRuleRef :: String
+    , cardSituationRef :: String } deriving (Show, Eq)
 
 data CardGenerator = CardGenerator 
     { generator :: [WordInfo] -> Card
@@ -23,24 +26,26 @@ data CardGenerator = CardGenerator
 instance Show CardGenerator where
     show x = cardGenRuleRef x ++ cardGenSituationRef x
 
+-- TODO: Default template
 handleCardSide :: TemplateFun -> [WordInfo] -> String
-handleCardSide DefaultTemplate _ = error "Not Implemented!"
 handleCardSide TemplateUndefined _ = error "This side is undefined"
+handleCardSide DefaultTemplate _ = error "Not Implemented!"
 handleCardSide (Template template) wordinfo =
     functionFromExpr (parseRuleString template) wordinfo
 
--- todo Default template!
-cardGeneratorFunction :: TemplateFun -> TemplateFun -> [WordInfo] -> Card
-cardGeneratorFunction frontTemplate backTemplate wordinfo =
+cardGeneratorFunction :: TemplateFun -> TemplateFun -> String -> String -> [WordInfo] -> Card
+cardGeneratorFunction frontTemplate backTemplate ruleRef situationRef wordinfo =
     Card 
         (handleCardSide frontTemplate wordinfo) 
         (handleCardSide backTemplate wordinfo)
+        ruleRef
+        situationRef
 
 cardGeneratorGenerator :: Situation -> Rule -> CardGenerator
 cardGeneratorGenerator situation rule =
     -- parse the sentences
     CardGenerator 
-        (cardGeneratorFunction (front situation) (back rule))
+        (cardGeneratorFunction (front situation) (back rule) (ruleName rule) (situationName situation))
         (ruleName rule)
         (situationName situation)
 
@@ -54,11 +59,39 @@ buildCardGenerator situation rawRules =
 filterCardsByRule :: String -> [CardGenerator] -> [CardGenerator]
 filterCardsByRule ruleref = filter (\c -> cardGenRuleRef c == ruleref)
 
+requireWord :: WordString -> String
+requireWord (Word wordstring) = wordstring
+requireWord (Undefined) = error "This field is not defined!"
+
+applyExceptionToCard :: Exception -> Card -> Card
+applyExceptionToCard exception card = 
+    card 
+        { cardFront = requireWord $ word replacement_word
+        , cardBack = requireWord $ translation replacement_word }
+  where replacement_word = replacementWord exception
+
+applyMaybeExceptionToCard :: Card -> Maybe Exception -> Card
+applyMaybeExceptionToCard card (Just exception) = 
+    applyExceptionToCard exception card
+applyMaybeExceptionToCard card (Nothing) = card
+
+
+filterExceptionsForRule :: Card -> [Exception] -> Maybe Exception
+filterExceptionsForRule card exceptions =
+    listToMaybe filtered_exceptions
+  where filtered_exceptions = filter ( (==) (cardSituationRef card) . situationRules) exceptions
+
+maybeApplyExceptionToCard :: [Exception] -> Card -> Card
+maybeApplyExceptionToCard exceptions card = 
+    applyMaybeExceptionToCard card $ filterExceptionsForRule card exceptions
+
 -- todo
 applyCardGeneratorsToExample :: [CardGenerator] -> Example -> [Card]
 applyCardGeneratorsToExample cardGenerators example =
-    map (\c -> generator c (wordSet example)) (filterCardsByRule (ruleRef example) cardGenerators)
-    -- and update these with example's exceptions
+    map (maybeApplyExceptionToCard (exceptions example)) generated_cards
+  where generated_cards = map (\c -> generator c (wordSet example)) (filterCardsByRule (ruleRef example) cardGenerators)
+
+
 
 applyCardGenerators :: [CardGenerator] -> [Example] -> [Card]
 applyCardGenerators cardgenerators =
@@ -66,9 +99,6 @@ applyCardGenerators cardgenerators =
 
 buildCard :: [Situation] -> [Rule] -> [Example] -> [Card]
 buildCard cardSituations cardRules =
-    -- Here we go.
-    -- step one, attach rules to situations
-    -- now get a list of cards
     applyCardGenerators card_generators
   where card_generators = concatMap (`buildCardGenerator` cardRules) cardSituations
 

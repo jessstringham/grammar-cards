@@ -32,7 +32,7 @@ data WordInfo = WordInfo
 
 data Exception = Exception 
     { situationRules :: String 
-    , replacementWords :: [WordInfo]
+    , replacementWord :: WordInfo
     } deriving (Show, Eq)
 
 data Example = Example 

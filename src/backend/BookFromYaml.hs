@@ -51,7 +51,7 @@ extractException :: Yaml.Exception -> Exception
 extractException rawException =
     Exception exception_situation_ref exception_replacement_rules
   where exception_situation_ref = Yaml.situationRef rawException
-        exception_replacement_rules = map extractWord (Yaml.words rawException)
+        exception_replacement_rules = extractWord $ Yaml.words rawException
 
 extractExceptions :: [Yaml.Exception] -> [Exception]
 extractExceptions = map extractException

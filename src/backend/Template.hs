@@ -1,11 +1,14 @@
 module Template
-( Expr(..)
-, RemoveThis(..)
+( RemoveThis(..)
 , AddThis(..)
 , OptionalChar(..)
-, parseSentenceString
-, RawTemplate(..)
+, parseRuleString
+, RawTemplate
+, Template
+, Expr(..)
 ) where
+
+type Template = [Expr]
 
 data Expr = WordText String 
           | PlaceHolder String Bool
@@ -19,18 +22,20 @@ data OptionalChar = OptionalChar Char Bool deriving (Show)
 
 type RawTemplate = String
 
+parseRuleString :: RawTemplate -> Template
 parseRuleString = parseSentenceString
 
-parseSentenceString :: RawTemplate -> [Expr]
+parseSentenceString :: RawTemplate -> Template
 parseSentenceString text = parseSentenceString' text []
 
+maybeAttachWord :: String -> Template -> Template
 maybeAttachWord word rest =
     if word == "" then 
         rest
     else
         (WordText $ reverse word):rest
 
-parseSentenceString' :: RawTemplate -> String -> [Expr]
+parseSentenceString' :: RawTemplate -> String -> Template
 parseSentenceString' [] [] = []
 parseSentenceString' [] word = maybeAttachWord word []
 parseSentenceString' (first:rest) word
@@ -44,11 +49,13 @@ parseSentenceString' (first:rest) word
         (ph_exprs, ph_remaining) = getPlaceHolder rest
 
 getPlaceHolder :: RawTemplate -> (Expr, RawTemplate)
+getPlaceHolder [] = error "Empty template for placeholder, what am I supposed to do!?"
 getPlaceHolder whole@(letter:rest)
     | letter == '_' = getPlaceHolder' rest [] True
     | otherwise = getPlaceHolder' whole [] False
 
 getPlaceHolder' :: RawTemplate -> String -> Bool -> (Expr, RawTemplate)
+getPlaceHolder' [] _ _ = error "Empty template! What is placeholder supposed to do?"
 getPlaceHolder' (letter:rest) parsedText translation
     | letter == '>' =
         (PlaceHolder (reverse parsedText) translation, rest)
@@ -59,6 +66,8 @@ getStringModifier :: RawTemplate -> (Expr, RawTemplate)
 getStringModifier rest = getRemoveRule rest []
 
 getRemoveRule :: RawTemplate -> [OptionalChar] -> (Expr, RawTemplate)
+getRemoveRule [] _ = error "getRemoveRule is missing the rest of its template!"
+getRemoveRule [_] _ = error "getRemoveRule is missing the rest of its template!"
 getRemoveRule (letter:next:rest) parsedText
     | letter == '|' = 
         (StringModifier (RemoveThis $ reverse parsedText) add_rule, remaining)
@@ -74,6 +83,7 @@ getAddRule :: RawTemplate -> (AddThis, RawTemplate)
 getAddRule text = getAddRule' text ""
 
 getAddRule' :: RawTemplate -> String -> (AddThis, RawTemplate)
+getAddRule' [] _ = error "missing the rest of the add rule!"
 getAddRule' (letter:rest) parsedTextProgress 
     | letter == '|' =
         (AddThis $ reverse parsedTextProgress, rest)

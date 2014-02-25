@@ -5,7 +5,7 @@ import System.Environment
 import BookFromYaml
 import CardGenerator
 import Helper
-import YamlParser
+import YamlParser()
 import qualified YamlBook as Yaml
 
 
@@ -13,13 +13,13 @@ main :: IO ()
 main = do
     bookLocation:wordsLocation:_ <- getArgs
 
-    yamlData <- BS.readFile bookLocation
-    let book_data = Data.Yaml.decodeEither yamlData :: Either String Yaml.Book
+    bookRawYaml <- BS.readFile bookLocation
+    let book_data = Data.Yaml.decodeEither bookRawYaml :: Either String Yaml.Book
     let bookYaml = checkEither book_data
     --putStrLn (show bookYaml)
     
-    yamlData <- BS.readFile wordsLocation
-    let wordsData = Data.Yaml.decodeEither yamlData :: Either String Yaml.Examples
+    wordsRawYaml <- BS.readFile wordsLocation
+    let wordsData = Data.Yaml.decodeEither wordsRawYaml :: Either String Yaml.Examples
     let wordsYaml = checkEither wordsData
     --putStrLn $ show wordsYaml
 

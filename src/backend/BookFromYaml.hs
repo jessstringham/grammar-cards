@@ -9,21 +9,21 @@ import Helper
 import qualified YamlBook as Yaml
 
 extractRule :: String -> Yaml.Rule -> Rule
-extractRule situationName rawRule = 
-    Rule (Yaml.rule rawRule) situationName (Template (Yaml.back rawRule))
+extractRule name rawRule = 
+    Rule (Yaml.rule rawRule) name (Template (Yaml.back rawRule))
 
 extractSituationRule :: Yaml.Situation -> (Situation, [Rule])
 extractSituationRule rawSituation =
-    (Situation sitname (Template front_card), rules)
+    (Situation sitname (Template front_card), yaml_rules)
     where sitname = Yaml.situation rawSituation
           front_card = Yaml.front rawSituation
-          rules = map (extractRule sitname) (Yaml.rules rawSituation)
+          yaml_rules = map (extractRule sitname) (Yaml.rules rawSituation)
 
 extractSituationsRules :: Yaml.Concept -> ([Situation], [Rule])
 extractSituationsRules rawConcept =
     splitList situation_list
-  where situations = Yaml.situations rawConcept
-        situation_list = map extractSituationRule situations
+  where yaml_situations = Yaml.situations rawConcept
+        situation_list = map extractSituationRule yaml_situations
 
 extractRequiredWords :: Yaml.Concept -> [String]
 extractRequiredWords = Yaml.wordlist
@@ -33,11 +33,11 @@ buildConcept sectionName rawConcept =
     emptyConcept { section=sectionName
                  , concept=conceptName
                  , requiredWords=required_words
-                 , situations=situations
-                 , rules=rules}
+                 , situations=yaml_situations
+                 , rules=yaml_rules}
 
   where conceptName = Yaml.concept rawConcept
-        (situations, rules) = extractSituationsRules rawConcept
+        (yaml_situations, yaml_rules) = extractSituationsRules rawConcept
         required_words = extractRequiredWords rawConcept
 
 buildSection :: Yaml.Section -> [Concept]
@@ -51,9 +51,9 @@ extractException :: Yaml.Exception -> Exception
 extractException rawException =
     Exception (Yaml.situationRef rawException) (map extractWord (Yaml.words rawException))
 
--- todo
+-- TODO
 extractExceptions :: [Yaml.Exception] -> [Exception]
-extractExceptions rawGroup = []
+extractExceptions = map extractException
 
 extractWord :: Yaml.Word -> WordInfo
 extractWord rawWord = 

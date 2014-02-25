@@ -1,7 +1,7 @@
 module Book
 ( WordInfo(..)
 , WordString(..)
-, Book(..)
+, Book
 , Concept(..)
 , emptyConcept
 , Situation(..)
@@ -98,9 +98,9 @@ checkAllWordsForNoUndefined =
 
 -- Returns True if all is well
 checkUniqueRules :: [Rule] -> Bool
-checkUniqueRules rules = 
+checkUniqueRules rulesToCheck = 
     id_list == nub id_list
-  where id_list = map (ruleName &&& situationRef) rules
+  where id_list = map (ruleName &&& situationRef) rulesToCheck
 
 
 main :: IO ()

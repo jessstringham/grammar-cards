@@ -5,12 +5,12 @@ module YamlBook
 , Situation(..)
 , Concept(..)
 , Section(..)
-, Book(..)
+, Book
 , Word(..)
 , Exception(..)
 , WordInfo(..)
 , Group(..)
-, Examples(..)
+, Examples
 ) where 
 
 

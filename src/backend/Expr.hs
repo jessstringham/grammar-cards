@@ -5,8 +5,9 @@ module Expr
 import Book
 import Template
 
-extractWord (Word word) = word
-extractWord a = error "Undefined! " ++ show a
+extractWord :: WordString -> String
+extractWord (Word wordStringWord) = wordStringWord
+extractWord errorMessage = error "Undefined! " ++ show errorMessage
 
 lookupWordSetWord :: [WordInfo] -> String -> Bool -> String
 lookupWordSetWord ws name isTranslation = 
@@ -20,10 +21,10 @@ lookupWordSetWord ws name isTranslation =
 -- This takes a template and returns a function that will convert a
 -- wordset to a string
 
-functionFromExpr :: [Expr] -> [WordInfo] -> String
+functionFromExpr :: Template -> [WordInfo] -> String
 functionFromExpr a b = functionFromExpr' a b ""
 
-functionFromExpr' :: [Expr] -> [WordInfo] -> String -> String
+functionFromExpr' :: Template -> [WordInfo] -> String -> String
 functionFromExpr' [] _ accum = accum
 functionFromExpr' (PlaceHolder name bool:rest) wordset accum = 
     accum ++ functionFromExpr' rest wordset (lookupWordSetWord wordset name bool)
@@ -50,6 +51,7 @@ removeCharacter (OptionalChar char optional) accum
     | optional = accum
     | otherwise = error "This word doesn't work!"
 
+tests :: String
 tests =
     let example1 = [WordInfo "noun" (Word "spelar") (Word "car")] in
     --let template1 = [PlaceHolder "noun" False, StringModifier (RemoveThis []) (AddThis "ar")] in

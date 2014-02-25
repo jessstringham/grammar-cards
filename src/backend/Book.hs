@@ -11,9 +11,10 @@ module Book
 , Exception(..)
 ) where
 
-import Template
 import Data.List
 import Control.Arrow
+
+import Template
 
 {- SHARED -}
 

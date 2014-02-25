@@ -2,8 +2,8 @@ module Expr
 ( functionFromExpr
 ) where
 
-import Template
 import Book
+import Template
 
 extractWord (Word word) = word
 extractWord a = error "Undefined! " ++ show a

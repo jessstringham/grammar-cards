@@ -5,10 +5,11 @@ module CardGenerator
 , applyCardGenerators
 ) where
 
+import Control.Exception.Base
+
 import Book
 import Expr
 import Template
-import Control.Exception.Base
 
 -- todo add tags and stuff
 data Card = Card 

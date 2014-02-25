@@ -5,7 +5,6 @@ import System.Environment
 import BookFromYaml
 import CardGenerator
 import Helper
-import YamlParser()
 import qualified YamlBook as Yaml
 
 

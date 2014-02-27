@@ -1,6 +1,5 @@
 module Template
 ( RemoveThis(..)
-, AddThis(..)
 , OptionalChar(..)
 , parseRuleString
 , RawTemplate
@@ -12,11 +11,10 @@ type Template = [Expr]
 
 data Expr = WordText String 
           | PlaceHolder String Bool
-          | StringModifier RemoveThis AddThis
+          | StringModifier RemoveThis
           deriving (Show)
 
 data RemoveThis = RemoveThis [OptionalChar] deriving (Show)
-data AddThis = AddThis String deriving (Show)
 
 data OptionalChar = OptionalChar Char Bool deriving (Show)
 
@@ -70,22 +68,10 @@ getRemoveRule [] _ = error "getRemoveRule is missing the rest of its template!"
 getRemoveRule [_] _ = error "getRemoveRule is missing the rest of its template!"
 getRemoveRule (letter:next:rest) parsedText
     | letter == '|' = 
-        (StringModifier (RemoveThis $ reverse parsedText) add_rule, remaining)
+        (StringModifier (RemoveThis $ reverse parsedText), rest)
     | next == '?' = 
             getRemoveRule rest opt_parsed_text
     | otherwise =
             getRemoveRule (next:rest) req_parsed_text
-  where (add_rule, remaining) = getAddRule (next:rest)
-        opt_parsed_text = OptionalChar letter True:parsedText
+  where opt_parsed_text = OptionalChar letter True:parsedText
         req_parsed_text = OptionalChar letter False:parsedText
-
-getAddRule :: RawTemplate -> (AddThis, RawTemplate)
-getAddRule text = getAddRule' text ""
-
-getAddRule' :: RawTemplate -> String -> (AddThis, RawTemplate)
-getAddRule' [] _ = error "missing the rest of the add rule!"
-getAddRule' (letter:rest) parsedTextProgress 
-    | letter == '|' =
-        (AddThis $ reverse parsedTextProgress, rest)
-    | otherwise =
-        getAddRule' rest (letter:parsedTextProgress)

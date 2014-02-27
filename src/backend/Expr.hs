@@ -28,14 +28,10 @@ functionFromExpr' :: Template -> [WordInfo] -> String -> String
 functionFromExpr' [] _ accum = accum
 functionFromExpr' (PlaceHolder name bool:rest) wordset accum = 
     accum ++ functionFromExpr' rest wordset (lookupWordSetWord wordset name bool)
-functionFromExpr' (StringModifier removeThis addThis:rest) wordset accum = 
-    functionFromExpr' rest wordset $ addCharacters addThis $ removeSomeCharacters removeThis accum
+functionFromExpr' (StringModifier removeThis:rest) wordset accum =
+    functionFromExpr' rest wordset $ removeSomeCharacters removeThis accum
 functionFromExpr' (WordText text:rest) wordset accum = 
     functionFromExpr' rest wordset (accum ++ text)
-
-addCharacters :: AddThis -> String -> String
-addCharacters (AddThis addThis) accum =
-    accum ++ addThis
 
 removeSomeCharacters :: RemoveThis -> String -> String
 removeSomeCharacters (RemoveThis removeThis) = removeSomeCharacters' removeThis
@@ -49,14 +45,14 @@ removeCharacter :: OptionalChar -> String -> String
 removeCharacter (OptionalChar char optional) accum
     | last accum == char = init accum
     | optional = accum
-    | otherwise = error "This word doesn't work!"
+    | otherwise = error "This word doesn'tests work!"
 
 tests :: String
 tests =
     let example1 = [WordInfo "noun" (Word "spelar") (Word "car")] in
-    --let template1 = [PlaceHolder "noun" False, StringModifier (RemoveThis []) (AddThis "ar")] in
-    let template1 = [WordText "jag "
-                    , PlaceHolder "noun" False
-                    , StringModifier (RemoveThis [OptionalChar 'r' True]) (AddThis "dde")] in
+    let template1 = [PlaceHolder "noun" False, StringModifier (RemoveThis [])] in
+    --let template1 = [WordText "jag "
+    --                , PlaceHolder "noun" False
+    --                , StringModifier (RemoveThis [OptionalChar 'r' True])] in
     functionFromExpr template1 example1
 

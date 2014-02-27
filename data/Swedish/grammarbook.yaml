@@ -29,11 +29,11 @@
       front: (several <_noun>)
       rules:
       - rule: or
-        back: <noun>|a|or|
-      - rule: ar
-        back: <noun>||ar|
+        back: <noun>|a|or
+      - rule: en
+        back: <noun>ar
       - rule: er
-        back: <noun>||er|
+        back: <noun>er
       - rule: ett en
         back: <noun>n
       - rule: X
@@ -76,14 +76,14 @@
       front: <_present_tense> (past tense)
       rules:
       - rule: default
-        back: <present_tense>|r?|de|
+        back: <present_tense>|r?|de
     - situation: Past Tense
       front: <_present_tense> (infinitive)
       rules:
       - rule: ar verbs
-        back: <present_tense>||r|
+        back: <present_tense>r
       - rule: er verbs
-        back: <present_tense>|er|a|
+        back: <present_tense>|er|a
   - concept: Irregular Verbs
     conceptTrait: 
     - TranslateEachWord # Goes through each word in word list and creates seperate situations for each.

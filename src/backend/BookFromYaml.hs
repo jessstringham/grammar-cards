@@ -15,8 +15,8 @@ import qualified YamlBook as Yaml
 -}
 
 extractRule :: String -> Yaml.Rule -> Rule
-extractRule situationName rawRule = 
-    Rule rule_name situationName rule_template
+extractRule ruleSituationName rawRule =
+    Rule rule_name ruleSituationName rule_template
   where rule_name = Yaml.ruleName rawRule
         rule_template = Template (Yaml.backText rawRule)
 

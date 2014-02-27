@@ -34,12 +34,12 @@ handleCardSide (Template template) wordinfo =
     functionFromExpr (parseRuleString template) wordinfo
 
 cardGeneratorFunction :: TemplateFun -> TemplateFun -> String -> String -> [WordInfo] -> Card
-cardGeneratorFunction frontTemplate backTemplate ruleRef situationRef wordinfo =
+cardGeneratorFunction frontTemplate backTemplate ruleRefCardGen situationRefCardGen wordinfo =
     Card 
         (handleCardSide frontTemplate wordinfo) 
         (handleCardSide backTemplate wordinfo)
-        ruleRef
-        situationRef
+        ruleRefCardGen
+        situationRefCardGen
 
 cardGeneratorGenerator :: Situation -> Rule -> CardGenerator
 cardGeneratorGenerator situation rule =
@@ -77,13 +77,13 @@ applyMaybeExceptionToCard card (Nothing) = card
 
 
 filterExceptionsForRule :: Card -> [Exception] -> Maybe Exception
-filterExceptionsForRule card exceptions =
+filterExceptionsForRule card allExceptions =
     listToMaybe filtered_exceptions
-  where filtered_exceptions = filter ( (==) (cardSituationRef card) . situationRules) exceptions
+  where filtered_exceptions = filter ( (==) (cardSituationRef card) . situationRules) allExceptions
 
 maybeApplyExceptionToCard :: [Exception] -> Card -> Card
-maybeApplyExceptionToCard exceptions card = 
-    applyMaybeExceptionToCard card $ filterExceptionsForRule card exceptions
+maybeApplyExceptionToCard allExceptions card =
+    applyMaybeExceptionToCard card $ filterExceptionsForRule card allExceptions
 
 -- todo
 applyCardGeneratorsToExample :: [CardGenerator] -> Example -> [Card]

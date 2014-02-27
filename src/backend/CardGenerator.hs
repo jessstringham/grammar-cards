@@ -3,6 +3,7 @@ module CardGenerator
 , getConceptCards
 , buildCard
 , applyCardGenerators
+, printCard
 ) where
 
 import Control.Exception.Base()
@@ -26,6 +27,10 @@ data CardGenerator = CardGenerator
 instance Show CardGenerator where
     show x = cardGenRuleRef x ++ cardGenSituationRef x
 
+printCard :: Card -> String
+printCard card =
+    cardFront card ++ "    " ++ cardBack card
+
 -- TODO: Default template
 handleCardSide :: TemplateFun -> [WordInfo] -> String
 handleCardSide TemplateUndefined _ = error "This side is undefined"
@@ -33,13 +38,15 @@ handleCardSide DefaultTemplate _ = error "Not Implemented!"
 handleCardSide (Template template) wordinfo =
     functionFromExpr (parseRuleString template) wordinfo
 
+
+-- why are the types like this? I do not know, something if flipped somewhere.
 cardGeneratorFunction :: TemplateFun -> TemplateFun -> String -> String -> [WordInfo] -> Card
-cardGeneratorFunction frontTemplate backTemplate ruleRefCardGen situationRefCardGen wordinfo =
-    Card 
-        (handleCardSide frontTemplate wordinfo) 
-        (handleCardSide backTemplate wordinfo)
-        ruleRefCardGen
-        situationRefCardGen
+cardGeneratorFunction backTemplate frontTemplate ruleRefCardGen situationRefCardGen wordinfo =
+    Card
+        { cardFront=(handleCardSide frontTemplate wordinfo)
+        , cardBack=(handleCardSide backTemplate wordinfo)
+        , cardRuleRef=ruleRefCardGen
+        , cardSituationRef=situationRefCardGen }
 
 cardGeneratorGenerator :: Situation -> Rule -> CardGenerator
 cardGeneratorGenerator situation rule =
@@ -63,11 +70,22 @@ requireWord :: WordString -> String
 requireWord (Word wordstring) = wordstring
 requireWord (Undefined) = error "This field is not defined!"
 
+defaultException :: WordString
+defaultException = Word "DEFAULT"
+
+getTranslation :: String -> WordInfo -> WordString
+getTranslation oldCardBack wordinfo =
+    if allegedTranslation == defaultException then
+        Word oldCardBack
+    else
+        allegedTranslation
+  where allegedTranslation = translation wordinfo
+
 applyExceptionToCard :: Exception -> Card -> Card
 applyExceptionToCard exception card = 
     card 
         { cardFront = requireWord $ word replacement_word
-        , cardBack = requireWord $ translation replacement_word }
+        , cardBack = requireWord $ getTranslation (cardBack card) replacement_word }
   where replacement_word = replacementWord exception
 
 applyMaybeExceptionToCard :: Card -> Maybe Exception -> Card

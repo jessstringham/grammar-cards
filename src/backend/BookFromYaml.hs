@@ -18,13 +18,13 @@ extractRule :: String -> Yaml.Rule -> Rule
 extractRule ruleSituationName rawRule =
     Rule rule_name ruleSituationName rule_template
   where rule_name = Yaml.ruleName rawRule
-        rule_template = Template (Yaml.backText rawRule)
+        rule_template = Template (Yaml.front rawRule)
 
 extractSituationRule :: Yaml.Situation -> (Situation, [Rule])
 extractSituationRule rawSituation =
-    (Situation sitname front_card, yaml_rules)
+    (Situation sitname back_card, yaml_rules)
   where sitname = Yaml.situation rawSituation
-        front_card = Template $ Yaml.front rawSituation
+        back_card = Template $ Yaml.back rawSituation
         yaml_rules = map (extractRule sitname) (Yaml.rules rawSituation)
 
 extractSituationsRules :: Yaml.Concept -> ([Situation], [Rule])

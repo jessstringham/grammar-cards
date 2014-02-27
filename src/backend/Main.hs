@@ -22,5 +22,6 @@ main = do
     let wordsYaml = checkEither wordsData
     --putStrLn $ show wordsYaml
 
-    print (getAllCards $ buildBook bookYaml wordsYaml)
+    mapM_ (print . printCard) (getAllCards $ buildBook bookYaml wordsYaml)
 
+    --print (buildBook bookYaml wordsYaml)

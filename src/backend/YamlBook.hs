@@ -20,25 +20,25 @@ import Data.Yaml
 
 data Rule = Rule 
     { ruleName :: String
-    , backText :: String} deriving (Show, Eq)
+    , front :: String} deriving (Show, Eq)
 
 instance FromJSON Rule where
     parseJSON (Object v) = Rule <$> 
                          v  .: "rule" <*>
-                         v  .: "back"
+                         v  .: "front"
 
     parseJSON _          = mzero
 
 
 data Situation = Situation 
     { situation :: String
-    , front :: String
+    , back :: String
     , rules :: [Rule]} deriving (Show, Eq)
 
 instance FromJSON Situation where
     parseJSON (Object v) = Situation <$> 
                          v  .: "situation" <*>
-                         v  .: "front" <*>
+                         v  .: "back" <*>
                          v  .: "rules"
 
     parseJSON _          = mzero

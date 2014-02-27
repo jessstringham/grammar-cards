@@ -9,5 +9,5 @@ hlint:
 	/Users/jessica/.cabal/bin/hlint *.hs
 
 clean:
-	rm *.o *.hi Main
+	rm -f *.o *.hi Main
 

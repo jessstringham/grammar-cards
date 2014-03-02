@@ -43,8 +43,8 @@ handleCardSide (Template template) wordinfo =
 cardGeneratorFunction :: TemplateFun -> TemplateFun -> String -> String -> [WordInfo] -> Card
 cardGeneratorFunction backTemplate frontTemplate ruleRefCardGen situationRefCardGen wordinfo =
     Card
-        { cardFront=(handleCardSide frontTemplate wordinfo)
-        , cardBack=(handleCardSide backTemplate wordinfo)
+        { cardFront=handleCardSide frontTemplate wordinfo
+        , cardBack=handleCardSide backTemplate wordinfo
         , cardRuleRef=ruleRefCardGen
         , cardSituationRef=situationRefCardGen }
 

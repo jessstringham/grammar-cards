@@ -27,7 +27,7 @@ type RawTemplate = String
 
 {- SHARED -}
 
--- Should I use Maybe here?
+-- Add default string here!
 data WordString = Word String | Undefined deriving (Show, Eq)
 
 data WordInfo = WordInfo

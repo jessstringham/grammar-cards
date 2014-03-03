@@ -2,6 +2,7 @@ module LanguageCenter.Util.Helper
 ( splitList
 , insertToValueList
 , checkEither
+, combinations
 ) where
 
 import qualified Data.Map as Map
@@ -20,3 +21,8 @@ insertToValueList key value mapList =
 checkEither :: Either String t -> t
 checkEither (Left err) = error err
 checkEither (Right dataThing) = dataThing
+
+combinations :: [a] -> [b] -> [(a, b)]
+combinations [] _ = []
+combinations _ [] = []
+combinations a@(a1:a_rest) b@(b1:b_rest) = (a1, b1):(combinations [a1] b_rest ++ combinations a_rest b)

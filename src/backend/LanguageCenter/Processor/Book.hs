@@ -1,4 +1,4 @@
-module Book
+module LanguageCenter.Processor.Book
 ( WordInfo(..)
 , WordString(..)
 , Book
@@ -14,12 +14,16 @@ module Book
 , WordRef(..)
 , CardFrontTemplateFun(..)
 , CardBackTemplateFun(..)
+, RawTemplate(..)
 ) where
 
 import Data.List
 import Control.Arrow
 
-import Template
+newtype WordRef = WordRef
+    { unWordRef :: String } deriving (Show, Eq)
+
+type RawTemplate = String
 
 {- SHARED -}
 

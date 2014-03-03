@@ -2,10 +2,10 @@ import qualified Data.ByteString.Char8 as BS
 import Data.Yaml
 import System.Environment
 
-import BookFromYaml
-import CardGenerator
-import Helper
-import qualified YamlBook as Yaml
+import LanguageCenter.Util.Helper
+import LanguageCenter.Reader.BookFromYaml
+import qualified LanguageCenter.Reader.YamlBook as Yaml
+import LanguageCenter.Processor.CardGenerator
 
 
 main :: IO ()

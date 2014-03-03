@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 -- This defines
-module YamlBook
+module LanguageCenter.Reader.YamlBook
 ( Rule(..)
 , Situation(..)
 , Concept(..)

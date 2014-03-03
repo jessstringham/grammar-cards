@@ -1,4 +1,4 @@
-module Helper
+module LanguageCenter.Util.Helper
 ( splitList
 , insertToValueList
 , checkEither

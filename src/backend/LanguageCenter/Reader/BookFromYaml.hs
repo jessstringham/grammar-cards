@@ -1,12 +1,12 @@
-module BookFromYaml
+module LanguageCenter.Reader.BookFromYaml
 ( buildBook
 ) where
 
 import qualified Data.Map as Map
 
-import Book
-import Helper
-import qualified YamlBook as Yaml
+import LanguageCenter.Processor.Book
+import LanguageCenter.Util.Helper
+import qualified LanguageCenter.Reader.YamlBook as Yaml
 
 {- Extraction:
     These take in info, the Yaml.*, and returns the *,

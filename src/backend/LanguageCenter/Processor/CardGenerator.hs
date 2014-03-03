@@ -1,4 +1,4 @@
-module CardGenerator
+module LanguageCenter.Processor.CardGenerator
 ( getAllCards
 , getConceptCards
 , buildCard
@@ -9,9 +9,8 @@ module CardGenerator
 import Control.Exception.Base()
 import Data.Maybe
 
-import Book
-import Expr
-import Template
+import LanguageCenter.Processor.Book
+import LanguageCenter.Processor.Template
 
 newtype CardFront = CardFront
     { unCardFront :: String } deriving (Show, Eq)

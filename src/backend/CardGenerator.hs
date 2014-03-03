@@ -13,23 +13,29 @@ import Book
 import Expr
 import Template
 
--- todo add tags and stuff
-data Card = Card 
-    { cardFront :: String
-    , cardBack :: String 
-    , cardRuleRef :: String
-    , cardSituationRef :: String } deriving (Show, Eq)
+newtype CardFront = CardFront
+    { unCardFront :: String } deriving (Show, Eq)
 
-data CardGenerator = CardGenerator 
+newtype CardBack = CardBack
+    { unCardBack :: String } deriving (Show, Eq)
+
+-- todo add tags and stuff
+data Card = Card
+    { cardFront :: CardFront
+    , cardBack :: CardBack
+    , cardRuleRef :: RuleRef
+    , cardSituationRef :: SituationRef } deriving (Show, Eq)
+
+data CardGenerator = CardGenerator
     { generator :: [WordInfo] -> Card
-    , cardGenRuleRef :: String 
-    , cardGenSituationRef :: String }
+    , cardGenRuleRef :: RuleRef
+    , cardGenSituationRef :: SituationRef }
 instance Show CardGenerator where
-    show x = cardGenRuleRef x ++ cardGenSituationRef x
+    show x = unRuleRef (cardGenRuleRef x) ++ unSituationRef (cardGenSituationRef x)
 
 printCard :: Card -> String
 printCard card =
-    cardFront card ++ "    " ++ cardBack card
+    unCardFront (cardFront card) ++ "    " ++ unCardBack (cardBack card)
 
 -- TODO: Default template
 handleCardSide :: TemplateFun -> [WordInfo] -> String
@@ -40,18 +46,18 @@ handleCardSide (Template template) wordinfo =
 
 
 -- why are the types like this? I do not know, something if flipped somewhere.
-cardGeneratorFunction :: TemplateFun -> TemplateFun -> String -> String -> [WordInfo] -> Card
-cardGeneratorFunction backTemplate frontTemplate ruleRefCardGen situationRefCardGen wordinfo =
+cardGeneratorFunction :: CardFrontTemplateFun -> CardBackTemplateFun -> RuleRef -> SituationRef -> [WordInfo] -> Card
+cardGeneratorFunction frontTemplate backTemplate ruleRefCardGen situationRefCardGen wordinfo =
     Card
-        { cardFront=handleCardSide frontTemplate wordinfo
-        , cardBack=handleCardSide backTemplate wordinfo
+        { cardFront=CardFront (handleCardSide (unCardFrontTemplateFun frontTemplate) wordinfo)
+        , cardBack=CardBack (handleCardSide (unCardBackTemplateFun backTemplate) wordinfo)
         , cardRuleRef=ruleRefCardGen
         , cardSituationRef=situationRefCardGen }
 
 cardGeneratorGenerator :: Situation -> Rule -> CardGenerator
 cardGeneratorGenerator situation rule =
     -- parse the sentences
-    CardGenerator 
+    CardGenerator
         (cardGeneratorFunction (front situation) (back rule) (ruleName rule) (situationName situation))
         (ruleName rule)
         (situationName situation)
@@ -63,7 +69,7 @@ buildCardGenerator situation rawRules =
     map (cardGeneratorGenerator situation) filtered_rules
   where filtered_rules = filter (\r -> situationName situation == situationRef r) rawRules
 
-filterCardsByRule :: String -> [CardGenerator] -> [CardGenerator]
+filterCardsByRule :: RuleRef -> [CardGenerator] -> [CardGenerator]
 filterCardsByRule ruleref = filter (\c -> cardGenRuleRef c == ruleref)
 
 requireWord :: WordString -> String
@@ -73,23 +79,23 @@ requireWord (Undefined) = error "This field is not defined!"
 defaultException :: WordString
 defaultException = Word "DEFAULT"
 
-getTranslation :: String -> WordInfo -> WordString
-getTranslation oldCardBack wordinfo =
-    if allegedTranslation == defaultException then
-        Word oldCardBack
+maybeReplaceCardSide :: String -> WordString -> WordString
+maybeReplaceCardSide oldCardText replacement =
+    if replacement == defaultException then
+        Word oldCardText
     else
-        allegedTranslation
-  where allegedTranslation = translation wordinfo
+        replacement
 
 applyExceptionToCard :: Exception -> Card -> Card
-applyExceptionToCard exception card = 
-    card 
-        { cardFront = requireWord $ word replacement_word
-        , cardBack = requireWord $ getTranslation (cardBack card) replacement_word }
-  where replacement_word = replacementWord exception
+applyExceptionToCard exception card =
+    card
+        { cardFront = CardFront (requireWord $ maybeReplaceCardSide (unCardFront (cardFront card)) new_front)
+        , cardBack = CardBack (requireWord $ maybeReplaceCardSide (unCardBack (cardBack card)) new_back) }
+  where new_front = newFront exception
+        new_back = newBack exception
 
 applyMaybeExceptionToCard :: Card -> Maybe Exception -> Card
-applyMaybeExceptionToCard card (Just exception) = 
+applyMaybeExceptionToCard card (Just exception) =
     applyExceptionToCard exception card
 applyMaybeExceptionToCard card (Nothing) = card
 

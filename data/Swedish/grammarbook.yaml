@@ -7,37 +7,37 @@
     conceptTrait: []
     situations:
     - situation: Translation # This is created by default if you use Translation concept trait, but you can also override it.
-      back: <_noun>
+      front: <_noun>
       rules:
-      - rule: default # If we look up a rule and fail, we fall front on default
-        front: <noun>
+      - rule: default # If we look up a rule and fail, we fall back on default
+        back: <noun>
     - situation: Indefinite Article
-      back: (a <_noun>)
+      front: (a <_noun>)
       rules:
       - rule: en
-        front: en <noun>
+        back: en <noun>
       - rule: ett
-        front: ett <noun>
+        back: ett <noun>
     - situation: Definite Article
-      back: (the <_noun>)
+      front: (the <_noun>)
       rules:
       - rule: en
-        front: <noun>en # naive for now
+        back: <noun>en # naive for now
       - rule: ett
-        front: <noun>ett
+        back: <noun>ett
     - situation: Indefinite Plural
-      back: (several <_noun>)
+      front: (several <_noun>)
       rules:
       - rule: or
-        front: <noun>|a|or
+        back: <noun>|a|or
       - rule: en
-        front: <noun>ar
+        back: <noun>ar
       - rule: er
-        front: <noun>er
+        back: <noun>er
       - rule: ett en
-        front: <noun>n
+        back: <noun>n
       - rule: X
-        front: <noun>
+        back: <noun>
 
 - section: Sentences
   concepts:
@@ -50,42 +50,42 @@
     conceptTrait: []
     situations:
     - situation: Normal
-      back: <_subject> <_verb1> <_verb2> <_rest>
+      front: <_subject> <_verb1> <_verb2> <_rest>
       rules:
       - rule: default
-        front: <subject> <verb1> <verb2> <rest>
+        back: <subject> <verb1> <verb2> <rest>
     - situation: Question
-      back: <_verb1> <subject> <_verb2> <_rest>
+      front: <_verb1> <subject> <_verb2> <_rest>
       rules:
       - rule: default
-        front: <verb1> <subject> <verb2> <rest>
+        back: <verb1> <subject> <verb2> <rest>
 - section: Verbs
   concepts:
   - concept: Regular Verbs
     wordlist:
     - present_tense
-    conceptTrait: 
+    conceptTrait:
     - TranslateEachWord
     situations:
     - situation: Present Tense
-      back: <_present_tense> (present tense)
+      front: <_present_tense> (present tense)
       rules:
       - rule: default
-        front: <present_tense>
+        back: <present_tense>
     - situation: Past Tense
-      back: <_present_tense> (past tense)
+      front: <_present_tense> (past tense)
       rules:
       - rule: default
-        front: <present_tense>|r?|de
+        back: <present_tense>|r?|de
     - situation: Past Tense
-      back: <_present_tense> (infinitive)
+      front: <_present_tense> (infinitive)
       rules:
       - rule: ar verbs
-        front: <present_tense>r
+        back: <present_tense>r
       - rule: er verbs
-        front: <present_tense>|er|a
+        back: <present_tense>|er|a
   - concept: Irregular Verbs
-    conceptTrait: 
+    conceptTrait:
     - TranslateEachWord # Goes through each word in word list and creates seperate situations for each.
     wordlist:
     - infinitive

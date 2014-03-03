@@ -16,7 +16,7 @@ main = do
     let book_data = Data.Yaml.decodeEither bookRawYaml :: Either String Yaml.Book
     let bookYaml = checkEither book_data
     --putStrLn (show bookYaml)
-    
+
     wordsRawYaml <- BS.readFile wordsLocation
     let wordsData = Data.Yaml.decodeEither wordsRawYaml :: Either String Yaml.Examples
     let wordsYaml = checkEither wordsData

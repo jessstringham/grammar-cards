@@ -15,10 +15,8 @@
     rule: en
     exceptions:
     - situation: Indefinite Plural
-      wordset:
-        name: noun
-        word: bocker
-        translation: DEFAULT
+      new_front: DEFAULT
+      new_back: bocker
 - section: Sentences
   concept: Commands and clauses with more than one verb
   words:

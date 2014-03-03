@@ -5,12 +5,16 @@ module Template
 , RawTemplate
 , Template
 , Expr(..)
+, WordRef(..)
 ) where
+
+newtype WordRef = WordRef
+    { unWordRef :: String } deriving (Show, Eq)
 
 type Template = [Expr]
 
-data Expr = WordText String 
-          | PlaceHolder String Bool
+data Expr = WordText String
+          | PlaceHolder WordRef Bool
           | StringModifier RemoveThis
           deriving (Show)
 
@@ -28,7 +32,7 @@ parseSentenceString text = parseSentenceString' text []
 
 maybeAttachWord :: String -> Template -> Template
 maybeAttachWord word rest =
-    if word == "" then 
+    if word == "" then
         rest
     else
         (WordText $ reverse word):rest
@@ -37,7 +41,7 @@ parseSentenceString' :: RawTemplate -> String -> Template
 parseSentenceString' [] [] = []
 parseSentenceString' [] word = maybeAttachWord word []
 parseSentenceString' (first:rest) word
-    | first == '|' = 
+    | first == '|' =
             maybeAttachWord word (mod_exprs:parseSentenceString mod_remaining)
     | first == '<' =
             maybeAttachWord word (ph_exprs:parseSentenceString ph_remaining)
@@ -54,11 +58,11 @@ getPlaceHolder whole@(letter:rest)
 
 getPlaceHolder' :: RawTemplate -> String -> Bool -> (Expr, RawTemplate)
 getPlaceHolder' [] _ _ = error "Empty template! What is placeholder supposed to do?"
-getPlaceHolder' (letter:rest) parsedText translation
+getPlaceHolder' (letter:rest) parsedText isTranslation
     | letter == '>' =
-        (PlaceHolder (reverse parsedText) translation, rest)
+        (PlaceHolder (WordRef (reverse parsedText)) isTranslation, rest)
     | otherwise =
-        getPlaceHolder' rest (letter:parsedText) translation
+        getPlaceHolder' rest (letter:parsedText) isTranslation
 
 getStringModifier :: RawTemplate -> (Expr, RawTemplate)
 getStringModifier rest = getRemoveRule rest []
@@ -67,9 +71,9 @@ getRemoveRule :: RawTemplate -> [OptionalChar] -> (Expr, RawTemplate)
 getRemoveRule [] _ = error "getRemoveRule is missing the rest of its template!"
 getRemoveRule [_] _ = error "getRemoveRule is missing the rest of its template!"
 getRemoveRule (letter:next:rest) parsedText
-    | letter == '|' = 
+    | letter == '|' =
         (StringModifier (RemoveThis $ reverse parsedText), rest)
-    | next == '?' = 
+    | next == '?' =
             getRemoveRule rest opt_parsed_text
     | otherwise =
             getRemoveRule (next:rest) req_parsed_text

@@ -9,8 +9,8 @@ extractWord :: WordString -> String
 extractWord (Word wordStringWord) = wordStringWord
 extractWord errorMessage = error "Undefined! " ++ show errorMessage
 
-lookupWordSetWord :: [WordInfo] -> String -> Bool -> String
-lookupWordSetWord ws name isTranslation = 
+lookupWordSetWord :: [WordInfo] -> WordRef -> Bool -> String
+lookupWordSetWord ws name isTranslation =
     extractWord
         (if isTranslation then
             translation word_set_word
@@ -26,11 +26,11 @@ functionFromExpr a b = functionFromExpr' a b ""
 
 functionFromExpr' :: Template -> [WordInfo] -> String -> String
 functionFromExpr' [] _ accum = accum
-functionFromExpr' (PlaceHolder name bool:rest) wordset accum = 
+functionFromExpr' (PlaceHolder name bool:rest) wordset accum =
     accum ++ functionFromExpr' rest wordset (lookupWordSetWord wordset name bool)
 functionFromExpr' (StringModifier removeThis:rest) wordset accum =
     functionFromExpr' rest wordset $ removeSomeCharacters removeThis accum
-functionFromExpr' (WordText text:rest) wordset accum = 
+functionFromExpr' (WordText text:rest) wordset accum =
     functionFromExpr' rest wordset (accum ++ text)
 
 removeSomeCharacters :: RemoveThis -> String -> String
@@ -38,7 +38,7 @@ removeSomeCharacters (RemoveThis removeThis) = removeSomeCharacters' removeThis
 
 removeSomeCharacters' :: [OptionalChar] -> String -> String
 removeSomeCharacters' [] accum = accum
-removeSomeCharacters' optionalChars accum = 
+removeSomeCharacters' optionalChars accum =
     foldl (flip removeCharacter) accum optionalChars
 
 removeCharacter :: OptionalChar -> String -> String
@@ -49,8 +49,8 @@ removeCharacter (OptionalChar char optional) accum
 
 tests :: String
 tests =
-    let example1 = [WordInfo "noun" (Word "spelar") (Word "car")] in
-    let template1 = [PlaceHolder "noun" False, StringModifier (RemoveThis [])] in
+    let example1 = [WordInfo (WordRef "noun") (Word "spelar") (Word "car")] in
+    let template1 = [PlaceHolder (WordRef "noun") False, StringModifier (RemoveThis [])] in
     --let template1 = [WordText "jag "
     --                , PlaceHolder "noun" False
     --                , StringModifier (RemoveThis [OptionalChar 'r' True])] in

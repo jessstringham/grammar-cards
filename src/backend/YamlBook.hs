@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
--- This defines 
+-- This defines
 module YamlBook
 ( Rule(..)
 , Situation(..)
@@ -12,39 +12,39 @@ module YamlBook
 , Group(..)
 , Examples
 , FromJSON
-) where 
+) where
 
 import Control.Monad
 import Control.Applicative
 import Data.Yaml
 
-data Rule = Rule 
+data Rule = Rule
     { ruleName :: String
-    , front :: String} deriving (Show, Eq)
+    , back :: String} deriving (Show, Eq)
 
 instance FromJSON Rule where
-    parseJSON (Object v) = Rule <$> 
+    parseJSON (Object v) = Rule <$>
                          v  .: "rule" <*>
-                         v  .: "front"
+                         v  .: "back"
 
     parseJSON _          = mzero
 
 
-data Situation = Situation 
+data Situation = Situation
     { situation :: String
-    , back :: String
+    , front :: String
     , rules :: [Rule]} deriving (Show, Eq)
 
 instance FromJSON Situation where
-    parseJSON (Object v) = Situation <$> 
+    parseJSON (Object v) = Situation <$>
                          v  .: "situation" <*>
-                         v  .: "back" <*>
+                         v  .: "front" <*>
                          v  .: "rules"
 
     parseJSON _          = mzero
 
 
-data Concept = Concept 
+data Concept = Concept
     { concept :: String
     , wordlist :: [String]
     , conceptTrait :: [String]
@@ -52,7 +52,7 @@ data Concept = Concept
     } deriving (Show, Eq)
 
 instance FromJSON Concept where
-    parseJSON (Object v) = Concept <$> 
+    parseJSON (Object v) = Concept <$>
                          v  .: "concept" <*>
                          v  .: "wordlist" <*>
                          v  .: "conceptTrait" <*>
@@ -61,13 +61,13 @@ instance FromJSON Concept where
     parseJSON _          = mzero
 
 
-data Section = Section 
+data Section = Section
     { section :: String
     , concepts :: [Concept]
     } deriving (Show, Eq)
 
 instance FromJSON Section where
-    parseJSON (Object v) = Section <$> 
+    parseJSON (Object v) = Section <$>
                          v  .: "section" <*>
                          v  .: "concepts"
 
@@ -77,14 +77,14 @@ instance FromJSON Section where
 type Book = [Section]
 
 
-data Word = Word 
+data Word = Word
     { label :: String
     , word :: String
     , translation :: String
     } deriving (Show, Eq)
 
 instance FromJSON Word where
-    parseJSON (Object v) = Word <$> 
+    parseJSON (Object v) = Word <$>
                          v  .: "name" <*>
                          v  .: "word" <*>
                          v  .: "translation"
@@ -92,42 +92,44 @@ instance FromJSON Word where
     parseJSON _          = mzero
 
 
-data Exception = Exception 
+data Exception = Exception
     { situationRef :: String
-    , words :: Word
+    , newFront :: String
+    , newBack :: String
     } deriving (Show, Eq)
 
 instance FromJSON Exception where
-    parseJSON (Object v) = Exception <$> 
+    parseJSON (Object v) = Exception <$>
                          v  .: "situation" <*>
-                         v  .: "wordset"
+                         v  .: "new_front" <*>
+                         v  .: "new_back"
 
     parseJSON _          = mzero
 
 
 -- WordInfo contains exceptions and info about them
-data WordInfo = WordInfo 
+data WordInfo = WordInfo
     { wordInfo :: [Word]
     , ruleRef :: String
     , exceptions :: [Exception]
     } deriving (Show, Eq)
 
 instance FromJSON WordInfo where
-    parseJSON (Object v) = WordInfo <$> 
+    parseJSON (Object v) = WordInfo <$>
                          v  .: "wordset" <*>
                          v  .: "rule" <*>
                          v  .: "exceptions"
 
     parseJSON _          = mzero
 
-data Group = Group 
+data Group = Group
     { sectionRef :: String
     , conceptRef :: String
     , wordsInfo :: [WordInfo]
     } deriving (Show, Eq)
 
 instance FromJSON Group where
-    parseJSON (Object v) = Group <$> 
+    parseJSON (Object v) = Group <$>
                          v  .: "section" <*>
                          v  .: "concept" <*>
                          v  .: "words"

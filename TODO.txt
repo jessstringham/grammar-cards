@@ -1,8 +1,10 @@
-TODO
 
+ * Working [0/3]
+ - [X] refs are newtype :style:
+ - [ ] strict records :style:
+ - [ ] lenses :style:
 
- - Optional fields in Yaml
- - Field to suggest things
- - Have hierarchy for rules?
- - have a way to sync up IDs (between word list)
- - Variable yaml field name?
+ * Future
+ - [ ] Optional fields in Yaml :yaml:
+ - [ ] Hierarchy of rules?
+ - [ ] syncing wordlist?

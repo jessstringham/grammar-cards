@@ -31,24 +31,24 @@ type RawTemplate = String
 data WordString = Word String | Undefined deriving (Show, Eq)
 
 data WordInfo = WordInfo
-    { wordName :: WordRef
-    , word :: WordString
-    , translation :: WordString
+    { wordName :: !WordRef
+    , word :: !WordString
+    , translation :: !WordString
     } deriving (Show, Eq)
 
 
 {- WORDS -}
 
 data Exception = Exception
-    { situationRules :: SituationRef
-    , newFront :: WordString
-    , newBack :: WordString
+    { situationRules :: !SituationRef
+    , newFront :: !WordString
+    , newBack :: !WordString
     } deriving (Show, Eq)
 
 data Example = Example
-    { wordSet :: [WordInfo]
-    , ruleRef :: RuleRef
-    , exceptions :: [Exception]
+    { wordSet :: ![WordInfo]
+    , ruleRef :: !RuleRef
+    , exceptions :: ![Exception]
     } deriving (Show, Eq)
 
 
@@ -74,8 +74,8 @@ newtype SituationRef = SituationRef
     { unSituationRef :: String } deriving (Show, Eq)
 
 data Situation = Situation
-    { situationName :: SituationRef
-    , front :: CardFrontTemplateFun
+    { situationName :: !SituationRef
+    , front :: !CardFrontTemplateFun
     } deriving (Show, Eq)
 
 {-
@@ -86,18 +86,18 @@ newtype RuleRef = RuleRef
     { unRuleRef :: String } deriving (Show, Eq)
 
 data Rule = Rule
-    { ruleName :: RuleRef
-    , situationRef :: SituationRef
-    , back :: CardBackTemplateFun
+    { ruleName :: !RuleRef
+    , situationRef :: !SituationRef
+    , back :: !CardBackTemplateFun
     } deriving (Show, Eq)
 
 data Concept = Concept
-    { concept :: String
-    , section :: String
-    , situations :: [Situation]
-    , rules :: [Rule]
-    , requiredWords :: [String]
-    , examples :: [Example]
+    { concept :: !String
+    , section :: !String
+    , situations :: ![Situation]
+    , rules :: ![Rule]
+    , requiredWords :: ![String]
+    , examples :: ![Example]
     } deriving (Show, Eq)
 
 emptyConcept :: Concept

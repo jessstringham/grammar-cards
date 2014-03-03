@@ -19,8 +19,8 @@ import Control.Applicative
 import Data.Yaml
 
 data Rule = Rule
-    { ruleName :: String
-    , back :: String} deriving (Show, Eq)
+    { ruleName :: !String
+    , back :: !String} deriving (Show, Eq)
 
 instance FromJSON Rule where
     parseJSON (Object v) = Rule <$>
@@ -31,9 +31,10 @@ instance FromJSON Rule where
 
 
 data Situation = Situation
-    { situation :: String
-    , front :: String
-    , rules :: [Rule]} deriving (Show, Eq)
+    { situation :: !String
+    , front :: !String
+    , rules :: ![Rule]
+    } deriving (Show, Eq)
 
 instance FromJSON Situation where
     parseJSON (Object v) = Situation <$>
@@ -45,10 +46,10 @@ instance FromJSON Situation where
 
 
 data Concept = Concept
-    { concept :: String
-    , wordlist :: [String]
-    , conceptTrait :: [String]
-    , situations :: [Situation]
+    { concept :: !String
+    , wordlist :: ![String]
+    , conceptTrait :: ![String]
+    , situations :: ![Situation]
     } deriving (Show, Eq)
 
 instance FromJSON Concept where
@@ -62,8 +63,8 @@ instance FromJSON Concept where
 
 
 data Section = Section
-    { section :: String
-    , concepts :: [Concept]
+    { section :: !String
+    , concepts :: ![Concept]
     } deriving (Show, Eq)
 
 instance FromJSON Section where
@@ -78,9 +79,9 @@ type Book = [Section]
 
 
 data Word = Word
-    { label :: String
-    , word :: String
-    , translation :: String
+    { label :: !String
+    , word :: !String
+    , translation :: !String
     } deriving (Show, Eq)
 
 instance FromJSON Word where
@@ -93,9 +94,9 @@ instance FromJSON Word where
 
 
 data Exception = Exception
-    { situationRef :: String
-    , newFront :: String
-    , newBack :: String
+    { situationRef :: !String
+    , newFront :: !String
+    , newBack :: !String
     } deriving (Show, Eq)
 
 instance FromJSON Exception where
@@ -109,9 +110,9 @@ instance FromJSON Exception where
 
 -- WordInfo contains exceptions and info about them
 data WordInfo = WordInfo
-    { wordInfo :: [Word]
-    , ruleRef :: String
-    , exceptions :: [Exception]
+    { wordInfo :: ![Word]
+    , ruleRef :: !String
+    , exceptions :: ![Exception]
     } deriving (Show, Eq)
 
 instance FromJSON WordInfo where
@@ -123,9 +124,9 @@ instance FromJSON WordInfo where
     parseJSON _          = mzero
 
 data Group = Group
-    { sectionRef :: String
-    , conceptRef :: String
-    , wordsInfo :: [WordInfo]
+    { sectionRef :: !String
+    , conceptRef :: !String
+    , wordsInfo :: ![WordInfo]
     } deriving (Show, Eq)
 
 instance FromJSON Group where

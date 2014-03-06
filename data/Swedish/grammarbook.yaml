@@ -9,7 +9,7 @@
     - situation: Translation # This is created by default if you use Translation concept trait, but you can also override it.
       front: <_noun>
       rules:
-      - rule: default # If we look up a rule and fail, we fall back on default
+      - rule: DEFAULT # If we look up a rule and fail, we fall back on default
         back: <noun>
     - situation: Indefinite Article
       front: (a <_noun>)
@@ -30,11 +30,11 @@
       rules:
       - rule: or
         back: <noun>|a|or
-      - rule: en
+      - rule: ar
         back: <noun>ar
       - rule: er
         back: <noun>er
-      - rule: ett en
+      - rule: -n
         back: <noun>n
       - rule: X
         back: <noun>
@@ -52,12 +52,12 @@
     - situation: Normal
       front: <_subject> <_verb1> <_verb2> <_rest>
       rules:
-      - rule: default
+      - rule: DEFAULT
         back: <subject> <verb1> <verb2> <rest>
     - situation: Question
       front: <_verb1> <subject> <_verb2> <_rest>
       rules:
-      - rule: default
+      - rule: DEFAULT
         back: <verb1> <subject> <verb2> <rest>
 - section: Verbs
   concepts:

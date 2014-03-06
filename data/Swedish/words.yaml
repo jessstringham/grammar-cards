@@ -6,13 +6,25 @@
     - name: noun
       word: bil
       translation: car
-    rule: en
+    rules:
+    - situation: Indefinite Article
+      rule: en
+    - situation: Definite Article
+      rule: en
+    - situation: Indefinite Plural
+      rule: ar
     exceptions: []
   - wordset:
     - name: noun
       word: bok
       translation: book
-    rule: en
+    rules:
+    - situation: Indefinite Article
+      rule: en
+    - situation: Definite Article
+      rule: en
+    - situation: Indefinite Plural
+      rule: ar
     exceptions:
     - situation: Indefinite Plural
       new_front: DEFAULT
@@ -33,5 +45,7 @@
     - name: rest
       word: choklad
       translation: chocolate
-    rule: DEFAULT
+    rules:
+    - situation: Question
+      rule: DEFAULT
     exceptions: []

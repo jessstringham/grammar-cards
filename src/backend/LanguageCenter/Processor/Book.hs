@@ -15,6 +15,7 @@ module LanguageCenter.Processor.Book
 , CardFrontTemplateFun(..)
 , CardBackTemplateFun(..)
 , RawTemplate(..)
+, RuleApplication(..)
 ) where
 
 import Data.List
@@ -45,9 +46,14 @@ data Exception = Exception
     , newBack :: !WordString
     } deriving (Show, Eq)
 
+data RuleApplication = RuleApplication
+    { raSituationRef :: !SituationRef
+    , raRuleRef :: !RuleRef
+    } deriving (Show, Eq)
+
 data Example = Example
     { wordSet :: ![WordInfo]
-    , ruleRef :: !RuleRef
+    , eRules :: ![RuleApplication]
     , exceptions :: ![Exception]
     } deriving (Show, Eq)
 

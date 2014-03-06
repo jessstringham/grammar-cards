@@ -12,6 +12,7 @@ module LanguageCenter.Reader.YamlBook
 , Group(..)
 , Examples
 , FromJSON
+, RuleApplication(..)
 ) where
 
 import Control.Monad
@@ -108,17 +109,29 @@ instance FromJSON Exception where
     parseJSON _          = mzero
 
 
+data RuleApplication = RuleApplication
+    { raSituationRef :: !String
+    , raRuleRef :: !String
+    } deriving (Show, Eq)
+
+instance FromJSON RuleApplication where
+    parseJSON (Object v) = RuleApplication <$>
+                         v  .: "situation" <*>
+                         v  .: "rule"
+
+    parseJSON _          = mzero
+
 -- WordInfo contains exceptions and info about them
 data WordInfo = WordInfo
     { wordInfo :: ![Word]
-    , ruleRef :: !String
+    , ruleRefs :: ![RuleApplication]
     , exceptions :: ![Exception]
     } deriving (Show, Eq)
 
 instance FromJSON WordInfo where
     parseJSON (Object v) = WordInfo <$>
                          v  .: "wordset" <*>
-                         v  .: "rule" <*>
+                         v  .: "rules" <*>
                          v  .: "exceptions"
 
     parseJSON _          = mzero

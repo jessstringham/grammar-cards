@@ -66,11 +66,14 @@ extractWord rawWord =
 extractWordSet :: [Yaml.Word] -> [WordInfo]
 extractWordSet = map extractWord
 
-extractExample :: Yaml.WordInfo -> Example
+
+extractRuleApplication :: Yaml.RuleApplication -> RuleApplication
+extractRuleApplication c = RuleApplication (SituationRef $ Yaml.raSituationRef c) (RuleRef $ Yaml.raRuleRef c)
+
 extractExample rawWordInfo =
     Example example_word_set example_rule_ref example_exceptions
   where example_word_set = extractWordSet $ Yaml.wordInfo rawWordInfo
-        example_rule_ref = RuleRef $ Yaml.ruleRef rawWordInfo
+        example_rule_ref = map extractRuleApplication $ Yaml.ruleRefs rawWordInfo
         example_exceptions = extractExceptions $ Yaml.exceptions rawWordInfo
 
 extractExamples :: Yaml.Group -> [Example]

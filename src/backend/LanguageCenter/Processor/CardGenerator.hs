@@ -9,6 +9,7 @@ module LanguageCenter.Processor.CardGenerator
 import Control.Exception.Base()
 import Data.Maybe
 
+import LanguageCenter.Util.Helper
 import LanguageCenter.Processor.Book
 import LanguageCenter.Processor.Template
 
@@ -102,15 +103,20 @@ applyExceptionToCardIfAny allExceptions card =
         Nothing -> card
   where maybe_exception = listToMaybe $ filter (exceptionMatchesSituation card) allExceptions
 
+checkCardAndRuleMatch :: (RuleApplication, CardGenerator) -> Bool
+checkCardAndRuleMatch (ruleAppl, cardGen) =
+    and[ (cardGenRuleRef cardGen == raRuleRef ruleAppl)
+       , (cardGenSituationRef cardGen == raSituationRef ruleAppl) ]
 
-filterCardGenByRule :: RuleRef -> [CardGenerator] -> [CardGenerator]
-filterCardGenByRule ruleref = filter (\c -> cardGenRuleRef c == ruleref)
 
--- todo
+filterCardGenByRule :: [RuleApplication] -> [CardGenerator] -> [CardGenerator]
+filterCardGenByRule ruleAppl cardGenerators =
+    map snd $ filter checkCardAndRuleMatch (combinations ruleAppl cardGenerators)
+
 applyCardGeneratorsToExample :: [CardGenerator] -> Example -> [Card]
 applyCardGeneratorsToExample cardGenerators example =
     map (applyExceptionToCardIfAny (exceptions example)) generated_cards
-  where filtered_cards = filterCardGenByRule (ruleRef example) cardGenerators
+  where filtered_cards = filterCardGenByRule (eRules example) cardGenerators
         generated_cards = map (\c -> generator c (wordSet example)) filtered_cards
 
 

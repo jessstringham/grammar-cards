@@ -115,7 +115,7 @@ removeCharacter :: OptionalChar -> String -> String
 removeCharacter (OptionalChar char optional) accum
     | last accum == char = init accum
     | optional = accum
-    | otherwise = error "This word doesn'tests work!"
+    | otherwise = error $ "This word doesn't work! " ++ accum
 
 tests :: String
 tests =

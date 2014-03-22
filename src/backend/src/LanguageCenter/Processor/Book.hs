@@ -1,22 +1,4 @@
-module LanguageCenter.Processor.Book
-( WordInfo(..)
-, WordString(..)
-, Book
-, Concept(..)
-, emptyConcept
-, Situation(..)
-, SituationRef(..)
-, Rule(..)
-, RuleRef(..)
-, TemplateFun(..)
-, Example(..)
-, Exception(..)
-, WordRef(..)
-, CardFrontTemplateFun(..)
-, CardBackTemplateFun(..)
-, RawTemplate(..)
-, RuleApplication(..)
-) where
+module LanguageCenter.Processor.Book where
 
 import Data.List
 import Control.Arrow
@@ -36,7 +18,6 @@ data WordInfo = WordInfo
     , word :: !WordString
     , translation :: !WordString
     } deriving (Show, Eq)
-
 
 {- WORDS -}
 
@@ -88,6 +69,8 @@ data Situation = Situation
 While rules may share ruleName's (that's how you group them!) and
 situationRef's, they shouldn't share both a ruleName and situationRef.
 -}
+
+
 newtype RuleRef = RuleRef
     { unRuleRef :: String } deriving (Show, Eq)
 

@@ -1,9 +1,9 @@
 
 all:
-	ghc Main.hs
+	ghc src/Main.hs
 
 picky:
-	ghc -Wall Main.hs
+	ghc -Wall src/Main.hs
 
 hlint:
 	/Users/jessica/.cabal/bin/hlint *.hs ./Reader/*.hs ./Processor/*.hs ./Util/*.hs

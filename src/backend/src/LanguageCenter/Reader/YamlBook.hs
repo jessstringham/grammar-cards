@@ -49,7 +49,7 @@ instance FromJSON Situation where
 data Concept = Concept
     { concept :: !String
     , wordlist :: ![String]
-    , conceptTrait :: ![String]
+    , conceptTraits :: ![String]
     , situations :: ![Situation]
     } deriving (Show, Eq)
 

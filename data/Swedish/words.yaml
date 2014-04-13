@@ -29,8 +29,23 @@
     - situation: Indefinite Plural
       new_front: DEFAULT
       new_back: bocker
+- section: Verbs
+  concept: Regular
+  words:
+  - wordset:
+    - name: present_tense
+      word: pratar
+      translation: to speak
+    rules:
+    - situation: Present Tense
+      rule: default
+    - situation: Past Tense
+      rule: er/ar verbs
+    - situation: Infinitive
+      rule: ar verbs
+    exceptions: []
 - section: Sentences
-  concept: Commands and clauses with more than one verb
+  concept: Commands
   words:
   - wordset:
     - name: subject

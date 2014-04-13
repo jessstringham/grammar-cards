@@ -1,3 +1,9 @@
+ * Features
+ - [ ] get ConceptTraits to work (verbs, default translations)
+ - [ ] get sentences to translate
+
+
+
 
  * Working [0/3]
  - [X] refs are newtype :style:

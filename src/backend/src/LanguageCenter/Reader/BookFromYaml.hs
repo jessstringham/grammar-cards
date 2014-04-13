@@ -7,7 +7,9 @@ import qualified Data.Map as Map
 import LanguageCenter.Processor.Book
 import LanguageCenter.Util.Helper
 import qualified LanguageCenter.Reader.YamlBook as Yaml
+import LanguageCenter.Util.PrettyPrint
 
+import Debug.Trace
 {- Extraction:
     These take in info, the Yaml.*, and returns the *,
     or does something built off of that
@@ -37,11 +39,15 @@ extractConcept sectionName rawConcept =
                  , concept=concept_name
                  , requiredWords=required_words
                  , situations=yaml_situations
-                 , rules=yaml_rules}
-
+                 , rules=yaml_rules
+                 , conceptTraits=concept_traits}
   where concept_name = Yaml.concept rawConcept
         (yaml_situations, yaml_rules) = extractSituationsRules rawConcept
         required_words = extractRequiredWords rawConcept
+        concept_traits = getConceptTraits rawConcept
+
+getConceptTraits :: Yaml.Concept -> [String]
+getConceptTraits = Yaml.conceptTraits
 
 extractRequiredWords :: Yaml.Concept -> [String]
 extractRequiredWords = Yaml.wordlist
@@ -83,7 +89,7 @@ extractExamples rawGroup =
 -- returns (section, concept) pair and a list of exceptions
 extractWordInfo :: Yaml.Group -> ((String, String), [Example])
 extractWordInfo rawGroup =
-    ((group_section_ref, group_concept_ref), group_examples)
+    ((group_concept_ref, group_section_ref), group_examples)
   where group_section_ref = Yaml.sectionRef rawGroup
         group_concept_ref = Yaml.conceptRef rawGroup
         group_examples = extractExamples rawGroup
@@ -99,12 +105,18 @@ extractExampleDict =
 type ExampleDict = Map.Map (String, String) [Example]
 
 updateWordList :: ExampleDict -> Concept -> Concept
+--updateWordList ed ci | trace (show $ Map.keys ed) False = undefined
+
+--("updating word " ++ show (map ppExample . concat . Map.elems $ ed)
 updateWordList exampleDict conceptInput =
     conceptInput { examples = Map.findWithDefault [] (concept conceptInput, section conceptInput) exampleDict }
 
 updateBookWithExamples :: ExampleDict -> Book -> Book
 updateBookWithExamples exampleDict =
     map (updateWordList exampleDict)
+
+
+
 
 buildSection :: Yaml.Section -> [Concept]
 buildSection rawSection =
@@ -113,6 +125,7 @@ buildSection rawSection =
 {- buildBook:
     just call this one to get yo' book
 -}
+
 
 buildBook :: Yaml.Book -> Yaml.Examples -> Book
 buildBook rawBook rawExample =

@@ -10,6 +10,8 @@ type RawTemplate = String
 
 {- SHARED -}
 
+data ConceptTrait = TranslateEachWord
+
 -- Add default string here!
 data WordString = Word String | Undefined deriving (Show, Eq)
 
@@ -87,10 +89,11 @@ data Concept = Concept
     , rules :: ![Rule]
     , requiredWords :: ![String]
     , examples :: ![Example]
+    , conceptTraits :: [String]
     } deriving (Show, Eq)
 
 emptyConcept :: Concept
-emptyConcept = Concept "" "" [] [] [] []
+emptyConcept = Concept "" "" [] [] [] [] []
 
 type Book = [Concept]
 

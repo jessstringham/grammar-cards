@@ -8,6 +8,7 @@ module LanguageCenter.Processor.CardGenerator
 
 import Control.Exception.Base()
 import Data.Maybe
+import Debug.Trace
 
 import LanguageCenter.Util.Helper
 import LanguageCenter.Processor.Book
@@ -37,7 +38,7 @@ instance Show CardGenerator where
 
 printCard :: Card -> String
 printCard card =
-    unCardFront (cardFront card) ++ "    " ++ unCardBack (cardBack card)
+    unCardFront (cardFront card) ++ "    " ++ unCardBack (cardBack card) ++ "    " ++ unSituationRef (cardSituationRef card) ++ "-" ++ unRuleRef (cardRuleRef card)
 
 handleCardSide :: TemplateFun -> [WordInfo] -> String
 handleCardSide TemplateUndefined _ = error "This side is undefined"
@@ -130,6 +131,7 @@ buildCard cardSituations cardRules =
     applyCardGenerators $ concatMap (`buildCardGenerator` cardRules) cardSituations
 
 getConceptCards :: Concept -> [Card]
+--getConceptCards cardConcept | trace ("myfun " ++ show cardConcept) False = undefined
 getConceptCards cardConcept = buildCard (situations cardConcept) (rules cardConcept) (examples cardConcept)
 
 getAllCards :: Book -> [Card]

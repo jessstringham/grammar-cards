@@ -41,7 +41,7 @@
 
 - section: Sentences
   concepts:
-  - concept: Commands and clauses with more than one verb
+  - concept: Commands
     wordlist:
     - subject
     - verb1
@@ -55,13 +55,13 @@
       - rule: DEFAULT
         back: <subject> <verb1> <verb2> <rest>
     - situation: Question
-      front: <_verb1> <subject> <_verb2> <_rest>
+      front: does <_subject> <_verb1> <_verb2> <_rest>
       rules:
       - rule: DEFAULT
         back: <verb1> <subject> <verb2> <rest>
 - section: Verbs
   concepts:
-  - concept: Regular Verbs
+  - concept: Regular
     wordlist:
     - present_tense
     conceptTrait:
@@ -75,13 +75,13 @@
     - situation: Past Tense
       front: <_present_tense> (past tense)
       rules:
-      - rule: default
+      - rule: er/ar verbs
         back: <present_tense>|r?|de
-    - situation: Past Tense
+    - situation: Infinitive
       front: <_present_tense> (infinitive)
       rules:
       - rule: ar verbs
-        back: <present_tense>r
+        back: <present_tense>|r|
       - rule: er verbs
         back: <present_tense>|er|a
   - concept: Irregular Verbs

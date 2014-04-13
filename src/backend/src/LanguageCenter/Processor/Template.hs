@@ -4,7 +4,11 @@ module LanguageCenter.Processor.Template
 ) where
 
 import LanguageCenter.Processor.Book
-
+import Text.Parsec.Text.Lazy
+import Text.Parsec.Combinator
+import Text.Parsec.Char
+import Text.Parsec
+import qualified Data.Text.Lazy as Tttttttttr
 
 type Template = [Expr]
 
@@ -19,61 +23,65 @@ data OptionalChar = OptionalChar Char Bool deriving (Show)
 
 
 
+
+matchWordText :: Parser Expr
+matchWordText = do
+    char '<'
+    translateToken <- optionMaybe $ char '_'
+    wordText <- manyTill anyChar (try (char '>'))
+
+    let should_translate = case (translateToken) of
+                            (Just a) -> True
+                            (Nothing) -> False
+
+    return $ PlaceHolder (WordRef wordText) should_translate
+
+matchMaybeChar :: Parser OptionalChar
+matchMaybeChar = do
+    charValue <- anyChar
+    optionalChar <- optionMaybe $ char '?'
+
+    let is_optional = case (optionalChar) of
+                            (Just a) -> True
+                            (Nothing) -> False
+
+    return $ OptionalChar charValue is_optional
+
+matchRemoveRule :: Parser Expr
+matchRemoveRule = do
+    char '|'
+    maybeChars <- manyTill matchMaybeChar (try (string "|"))
+
+    return $ StringModifier $ RemoveThis maybeChars
+
+many1till :: Parser a -> Parser b -> Parser [a]
+many1till matchmany ending = do
+    fir <- matchmany
+    rest <- manyTill matchmany ending
+    return $ fir:rest
+
+
+matchText :: Parser Expr
+matchText = do
+    allText <- many1till anyChar (try (lookAhead (choice [(string "|"), (string "<"), (eof >> return "")])))
+
+    return $ WordText allText
+
+
+parseRuleString' :: Parser Template
+parseRuleString' = do
+    result <- many1 $ choice (map try [matchWordText, matchRemoveRule, matchText])
+    return result
+    
 parseRuleString :: RawTemplate -> Template
-parseRuleString = parseSentenceString
+parseRuleString nnnnnnnr = 
+    case (result) of
+        (Left a) -> error $ show a
+        (Right a) -> a
+  where result = parse parseRuleString' "" $ Tttttttttr.pack nnnnnnnr
 
-parseSentenceString :: RawTemplate -> Template
-parseSentenceString text = parseSentenceString' text []
 
-maybeAttachWord :: String -> Template -> Template
-maybeAttachWord word rest =
-    if word == "" then
-        rest
-    else
-        (WordText $ reverse word):rest
 
-parseSentenceString' :: RawTemplate -> String -> Template
-parseSentenceString' [] [] = []
-parseSentenceString' [] word = maybeAttachWord word []
-parseSentenceString' (first:rest) word
-    | first == '|' =
-            maybeAttachWord word (mod_exprs:parseSentenceString mod_remaining)
-    | first == '<' =
-            maybeAttachWord word (ph_exprs:parseSentenceString ph_remaining)
-    | otherwise =
-        parseSentenceString' rest (first:word)
-  where (mod_exprs, mod_remaining) = getStringModifier rest
-        (ph_exprs, ph_remaining) = getPlaceHolder rest
-
-getPlaceHolder :: RawTemplate -> (Expr, RawTemplate)
-getPlaceHolder [] = error "Empty template for placeholder, what am I supposed to do!?"
-getPlaceHolder whole@(letter:rest)
-    | letter == '_' = getPlaceHolder' rest [] True
-    | otherwise = getPlaceHolder' whole [] False
-
-getPlaceHolder' :: RawTemplate -> String -> Bool -> (Expr, RawTemplate)
-getPlaceHolder' [] _ _ = error "Empty template! What is placeholder supposed to do?"
-getPlaceHolder' (letter:rest) parsedText isTranslation
-    | letter == '>' =
-        (PlaceHolder (WordRef (reverse parsedText)) isTranslation, rest)
-    | otherwise =
-        getPlaceHolder' rest (letter:parsedText) isTranslation
-
-getStringModifier :: RawTemplate -> (Expr, RawTemplate)
-getStringModifier rest = getRemoveRule rest []
-
-getRemoveRule :: RawTemplate -> [OptionalChar] -> (Expr, RawTemplate)
-getRemoveRule [] _ = error "getRemoveRule is missing the rest of its template!"
-getRemoveRule [_] _ = error "getRemoveRule is missing the rest of its template!"
-getRemoveRule (letter:next:rest) parsedText
-    | letter == '|' =
-        (StringModifier (RemoveThis $ reverse parsedText), rest)
-    | next == '?' =
-            getRemoveRule rest opt_parsed_text
-    | otherwise =
-            getRemoveRule (next:rest) req_parsed_text
-  where opt_parsed_text = OptionalChar letter True:parsedText
-        req_parsed_text = OptionalChar letter False:parsedText
 
 extractWord :: WordString -> String
 extractWord (Word wordStringWord) = wordStringWord
@@ -117,12 +125,6 @@ removeCharacter (OptionalChar char optional) accum
     | optional = accum
     | otherwise = error $ "This word doesn't work! " ++ accum
 
-tests :: String
-tests =
-    let example1 = [WordInfo (WordRef "noun") (Word "spelar") (Word "car")] in
-    let template1 = [PlaceHolder (WordRef "noun") False, StringModifier (RemoveThis [])] in
-    --let template1 = [WordText "jag "
-    --                , PlaceHolder "noun" False
-    --                , StringModifier (RemoveThis [OptionalChar 'r' True])] in
-    functionFromExpr template1 example1
+
+
 

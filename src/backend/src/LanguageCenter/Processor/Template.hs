@@ -27,7 +27,7 @@ matchWordText = do
     translateToken <- optionMaybe $ char '_'
     wordText <- manyTill anyChar (try (char '>'))
 
-    let should_translate = case (translateToken) of
+    let should_translate = case translateToken of
                             (Just a) -> True
                             (Nothing) -> False
 
@@ -38,7 +38,7 @@ matchMaybeChar = do
     charValue <- anyChar
     optionalChar <- optionMaybe $ char '?'
 
-    let is_optional = case (optionalChar) of
+    let is_optional = case optionalChar of
                             (Just a) -> True
                             (Nothing) -> False
 
@@ -60,19 +60,23 @@ many1till matchmany ending = do
 
 matchText :: Parser Expr
 matchText = do
-    allText <- many1till anyChar (try (lookAhead (choice [(string "|"), (string "<"), (eof >> return "")])))
-
+    allText <- many1till anyChar 
+        (try 
+            (lookAhead 
+                (choice [ string "|"
+                        , string "<"
+                        , eof >> return ""
+                        ])))
     return $ WordText allText
 
 
 parseRuleString' :: Parser Template
-parseRuleString' = do
-    result <- many1 $ choice (map try [matchWordText, matchRemoveRule, matchText])
-    return result
-    
+parseRuleString' = 
+    many1 $ choice (map try [matchWordText, matchRemoveRule, matchText])
+
 parseRuleString :: RawTemplate -> Template
 parseRuleString rawTemplate = 
-    case (result) of
+    case result of
         (Left a) -> error $ show a
         (Right a) -> a
   where result = parse parseRuleString' "" $ TextLazy.pack rawTemplate

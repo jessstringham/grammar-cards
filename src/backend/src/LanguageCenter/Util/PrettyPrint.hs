@@ -16,7 +16,7 @@ ppWordRef wr = text (unWordRef wr)
 -- type RawTemplate = String
 
 ppRawTemplate :: RawTemplate -> Doc
-ppRawTemplate rt = text rt
+ppRawTemplate = text
 
 -- data ConceptTrait = TranslateEachWord
 

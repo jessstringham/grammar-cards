@@ -63,4 +63,6 @@
     rules:
     - situation: Question
       rule: DEFAULT
+    - situation: Normal
+      rule: DEFAULT
     exceptions: []

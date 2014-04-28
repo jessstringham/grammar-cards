@@ -55,7 +55,7 @@
       - rule: DEFAULT
         back: <subject> <verb1> <verb2> <rest>
     - situation: Question
-      front: does <_subject> <_verb1> <_verb2> <_rest>
+      front: does <_subject> (<_verb1>) <_verb2> <_rest>
       rules:
       - rule: DEFAULT
         back: <verb1> <subject> <verb2> <rest>

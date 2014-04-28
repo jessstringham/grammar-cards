@@ -6,7 +6,7 @@ where
 
 import LanguageCenter.Processor.Book
 import Text.PrettyPrint.HughesPJ
- 
+
 -- newtype WordRef = WordRef
 --     { unWordRef :: String } deriving (Show, Eq)
 

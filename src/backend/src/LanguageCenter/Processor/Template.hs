@@ -8,7 +8,7 @@ import Text.Parsec.Text.Lazy
 import Text.Parsec.Combinator
 import Text.Parsec.Char
 import Text.Parsec
-import qualified Data.Text.Lazy as Tttttttttr
+import qualified Data.Text.Lazy as TextLazy
 
 type Template = [Expr]
 
@@ -20,9 +20,6 @@ data Expr = WordText String
 data RemoveThis = RemoveThis [OptionalChar] deriving (Show)
 
 data OptionalChar = OptionalChar Char Bool deriving (Show)
-
-
-
 
 matchWordText :: Parser Expr
 matchWordText = do
@@ -74,11 +71,11 @@ parseRuleString' = do
     return result
     
 parseRuleString :: RawTemplate -> Template
-parseRuleString nnnnnnnr = 
+parseRuleString rawTemplate = 
     case (result) of
         (Left a) -> error $ show a
         (Right a) -> a
-  where result = parse parseRuleString' "" $ Tttttttttr.pack nnnnnnnr
+  where result = parse parseRuleString' "" $ TextLazy.pack rawTemplate
 
 
 

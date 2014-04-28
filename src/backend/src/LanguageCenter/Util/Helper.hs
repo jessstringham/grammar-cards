@@ -25,4 +25,4 @@ checkEither (Right dataThing) = dataThing
 combinations :: [a] -> [b] -> [(a, b)]
 combinations [] _ = []
 combinations _ [] = []
-combinations a@(a1:a_rest) b@(b1:b_rest) = (a1, b1):(combinations [a1] b_rest ++ combinations a_rest b)
+combinations (a1:a_rest) b@(b1:b_rest) = (a1, b1):(combinations [a1] b_rest ++ combinations a_rest b)

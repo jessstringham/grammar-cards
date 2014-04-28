@@ -2,7 +2,9 @@ module LanguageCenter.Util.PrettyPrint
 ( ppBook
 , ppExample
 , ppCard
-, printCard)
+, printCard
+, ppRawTemplate
+, ppConceptTrait)
 where
 
 import LanguageCenter.Processor.Book
@@ -44,7 +46,7 @@ ppRawTemplate = text
 -- data ConceptTrait = TranslateEachWord
 
 ppConceptTrait :: ConceptTrait -> Doc
-ppConceptTrait rt = text "Translate Each Word"
+ppConceptTrait _ = text "Translate Each Word"
 
 -- data WordString = Word String | Undefined deriving (Show, Eq)
 
@@ -200,6 +202,7 @@ ppBook book =
     vcat (map (\b -> text "-" $$ nest 2 (ppConcept b) ) book)
 
 
+testplace :: Doc
 testplace =
     ppBook sample_book
   where sample_wordref = WordRef "wordref"

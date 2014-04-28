@@ -7,9 +7,7 @@ import qualified Data.Map as Map
 import LanguageCenter.Processor.Book
 import LanguageCenter.Util.Helper
 import qualified LanguageCenter.Reader.YamlBook as Yaml
-import LanguageCenter.Util.PrettyPrint
 
-import Debug.Trace
 {- Extraction:
     These take in info, the Yaml.*, and returns the *,
     or does something built off of that
@@ -76,6 +74,7 @@ extractWordSet = map extractWord
 extractRuleApplication :: Yaml.RuleApplication -> RuleApplication
 extractRuleApplication c = RuleApplication (SituationRef $ Yaml.raSituationRef c) (RuleRef $ Yaml.raRuleRef c)
 
+extractExample :: Yaml.WordInfo -> Example
 extractExample rawWordInfo =
     Example example_word_set example_rule_ref example_exceptions
   where example_word_set = extractWordSet $ Yaml.wordInfo rawWordInfo

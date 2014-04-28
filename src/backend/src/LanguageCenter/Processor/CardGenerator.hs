@@ -7,14 +7,9 @@ module LanguageCenter.Processor.CardGenerator
 import Control.Exception.Base()
 import Control.Applicative
 import Data.Maybe
-import Debug.Trace
 
-import LanguageCenter.Util.Helper
-import LanguageCenter.Util.PrettyPrint
 import LanguageCenter.Processor.Book
 import LanguageCenter.Processor.Template
-
-
 
 
 handleCardSide :: TemplateFun -> [WordInfo] -> String
@@ -22,9 +17,6 @@ handleCardSide TemplateUndefined _ = error "This side is undefined"
 handleCardSide DefaultTemplate _ = error "Not Implemented!"
 handleCardSide (Template template) wordinfo =
     functionFromExpr (parseRuleString template) wordinfo
-
-
-
 
 applyExceptionToCard :: Exception -> Card -> Card
 applyExceptionToCard exception card =
@@ -63,8 +55,8 @@ cardGeneratorFunction situation rule example =
         card = Card
             { cardFront=CardFront (handleCardSide (unCardFrontTemplateFun (front situation)) (wordSet example))
             , cardBack=CardBack (handleCardSide (unCardBackTemplateFun (back rule)) (wordSet example))
-            , cardRuleRef=(ruleName rule)
-            , cardSituationRef=(situationName situation) 
+            , cardRuleRef=ruleName rule
+            , cardSituationRef=situationName situation
             , exceptional=False}
         applicable_exception = listToMaybe $ filter (exceptionMatchesSituation card) (exceptions example)
 
@@ -82,8 +74,10 @@ requireWord :: WordString -> String
 requireWord (Word wordstring) = wordstring
 requireWord (Undefined) = error "This field is not defined!"
 
+
 defaultException :: WordString
 defaultException = Word "DEFAULT"
+
 
 maybeReplaceCardSide :: String -> WordString -> WordString
 maybeReplaceCardSide oldCardText replacement =
@@ -94,9 +88,9 @@ maybeReplaceCardSide oldCardText replacement =
 
 
 applyCardGenerators :: [CardGenerator] -> [Example] -> [Card]
-applyCardGenerators cardgenerators examples =
+applyCardGenerators cardgenerators wordexamples =
     filtered_cards
-  where generated_cards = map generator cardgenerators <*> examples
+  where generated_cards = map generator cardgenerators <*> wordexamples
         filtered_cards = catMaybes generated_cards
 
 
@@ -107,13 +101,15 @@ buildCardGenerator situation rawRules =
     map (cardGeneratorGenerator situation) filtered_rules
   where filtered_rules = filter (compareSituationRef situation) rawRules
 
+
 -- go through each concept and create a list of cards
 getConceptCards :: Concept -> [Card]
 getConceptCards cardConcept = 
-    (applyCardGenerators $ 
+    applyCardGenerators $ 
         concatMap 
-            (`buildCardGenerator` rules cardConcept) (situations cardConcept))
+            (`buildCardGenerator` rules cardConcept) (situations cardConcept)
     $ examples cardConcept
+
 
 getAllCards :: Book -> [Card]
 getAllCards = concatMap getConceptCards

@@ -23,12 +23,12 @@ data OptionalChar = OptionalChar Char Bool deriving (Show)
 
 matchWordText :: Parser Expr
 matchWordText = do
-    char '<'
+    _ <- char '<'
     translateToken <- optionMaybe $ char '_'
     wordText <- manyTill anyChar (try (char '>'))
 
     let should_translate = case translateToken of
-                            (Just a) -> True
+                            (Just _) -> True
                             (Nothing) -> False
 
     return $ PlaceHolder (WordRef wordText) should_translate
@@ -39,14 +39,14 @@ matchMaybeChar = do
     optionalChar <- optionMaybe $ char '?'
 
     let is_optional = case optionalChar of
-                            (Just a) -> True
+                            (Just _) -> True
                             (Nothing) -> False
 
     return $ OptionalChar charValue is_optional
 
 matchRemoveRule :: Parser Expr
 matchRemoveRule = do
-    char '|'
+    _ <- char '|'
     maybeChars <- manyTill matchMaybeChar (try (string "|"))
 
     return $ StringModifier $ RemoveThis maybeChars
@@ -121,9 +121,9 @@ removeSomeCharacters' optionalChars accum =
     foldl (flip removeCharacter) accum optionalChars
 
 removeCharacter :: OptionalChar -> String -> String
-removeCharacter (OptionalChar char optional) accum
-    | last accum == char = init accum
-    | optional = accum
+removeCharacter (OptionalChar character is_optional) accum
+    | last accum == character = init accum
+    | is_optional = accum
     | otherwise = error $ "This word doesn't work! " ++ accum
 
 

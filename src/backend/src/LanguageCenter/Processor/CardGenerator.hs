@@ -9,7 +9,6 @@ import Control.Exception.Base()
 import Control.Applicative
 import Data.Maybe
 import Debug.Trace
-import Data.Maybe
 
 import LanguageCenter.Util.Helper
 import LanguageCenter.Util.PrettyPrint
@@ -73,8 +72,8 @@ handleCardSide (Template template) wordinfo =
 
 checkCardAndRuleMatch' :: [RuleApplication] -> RuleRef -> SituationRef -> Bool
 checkCardAndRuleMatch' ruleAppls ruleRef sitRef =
-    any (\ruleAppl -> and[ (ruleRef == raRuleRef ruleAppl)
-       , (sitRef == raSituationRef ruleAppl) ]) ruleAppls
+    any (\ruleAppl -> (ruleRef == raRuleRef ruleAppl)
+       && (sitRef == raSituationRef ruleAppl) ) ruleAppls
 
 applyExceptionToCard :: Exception -> Card -> Card
 applyExceptionToCard exception card =
@@ -92,7 +91,7 @@ cardGeneratorFunction frontTemplate backTemplate ruleRefCardGen situationRefCard
             Nothing -> Just card
     else
         Nothing
-  where is_relevant = (checkCardAndRuleMatch' (eRules example) ruleRefCardGen situationRefCardGen)
+  where is_relevant = checkCardAndRuleMatch' (eRules example) ruleRefCardGen situationRefCardGen
         card = Card
             { cardFront=CardFront (handleCardSide (unCardFrontTemplateFun frontTemplate) (wordSet example))
             , cardBack=CardBack (handleCardSide (unCardBackTemplateFun backTemplate) (wordSet example))
@@ -103,8 +102,8 @@ cardGeneratorFunction frontTemplate backTemplate ruleRefCardGen situationRefCard
 
 checkCardAndRuleMatch :: (RuleApplication, CardGenerator) -> Bool
 checkCardAndRuleMatch (ruleAppl, cardGen) =
-    and[ (cardGenRuleRef cardGen == raRuleRef ruleAppl)
-       , (cardGenSituationRef cardGen == raSituationRef ruleAppl) ]
+    (cardGenRuleRef cardGen == raRuleRef ruleAppl)
+    && (cardGenSituationRef cardGen == raSituationRef ruleAppl)
 
 
 cardGeneratorGenerator :: Situation -> Rule -> CardGenerator
@@ -146,14 +145,13 @@ filterCardGenByRule ruleAppl cardGenerators =
 applyCardGenerators :: [CardGenerator] -> [Example] -> [Card]
 applyCardGenerators cardgenerators examples =
     filtered_cards
-  where generated_cards = (map generator cardgenerators) <*> examples
+  where generated_cards = map generator cardgenerators <*> examples
         filtered_cards = catMaybes generated_cards
     
 -- go through each concept and create a list of cards
 getConceptCards :: Concept -> [Card]
 getConceptCards cardConcept = 
-    (applyCardGenerators $ concatMap (`buildCardGenerator` (rules cardConcept)) (situations cardConcept)) (examples cardConcept)
-
+    (applyCardGenerators $ concatMap (`buildCardGenerator` rules cardConcept) (situations cardConcept)) (examples cardConcept)
 
 getAllCards :: Book -> [Card]
 getAllCards = concatMap getConceptCards

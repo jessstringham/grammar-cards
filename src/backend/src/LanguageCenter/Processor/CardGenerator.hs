@@ -1,7 +1,6 @@
 module LanguageCenter.Processor.CardGenerator
 ( getAllCards
 , getConceptCards
-, buildCard
 , applyCardGenerators
 , printCard
 ) where
@@ -77,17 +76,30 @@ checkCardAndRuleMatch' ruleAppls ruleRef sitRef =
     any (\ruleAppl -> and[ (ruleRef == raRuleRef ruleAppl)
        , (sitRef == raSituationRef ruleAppl) ]) ruleAppls
 
+applyExceptionToCard :: Exception -> Card -> Card
+applyExceptionToCard exception card =
+    card { cardFront = new_front, cardBack = new_back, exceptional = True }
+  where maybe_new_front = newFront exception
+        maybe_new_back = newBack exception
+        new_front = CardFront (requireWord $ maybeReplaceCardSide (unCardFront (cardFront card)) maybe_new_front)
+        new_back = CardBack (requireWord $ maybeReplaceCardSide (unCardBack (cardBack card)) maybe_new_back)
+
 cardGeneratorFunction :: CardFrontTemplateFun -> CardBackTemplateFun -> RuleRef -> SituationRef -> Example -> Maybe Card
 cardGeneratorFunction frontTemplate backTemplate ruleRefCardGen situationRefCardGen example =
-    if (checkCardAndRuleMatch' (eRules example) ruleRefCardGen situationRefCardGen) then
-        Just Card
+    if is_relevant then
+        case applicable_exception of
+            Just exception -> Just $ applyExceptionToCard exception card
+            Nothing -> Just card
+    else
+        Nothing
+  where is_relevant = (checkCardAndRuleMatch' (eRules example) ruleRefCardGen situationRefCardGen)
+        card = Card
             { cardFront=CardFront (handleCardSide (unCardFrontTemplateFun frontTemplate) (wordSet example))
             , cardBack=CardBack (handleCardSide (unCardBackTemplateFun backTemplate) (wordSet example))
             , cardRuleRef=ruleRefCardGen
             , cardSituationRef=situationRefCardGen 
             , exceptional=False}
-    else
-        Nothing
+        applicable_exception = listToMaybe $ filter (exceptionMatchesSituation card) (exceptions example)
 
 checkCardAndRuleMatch :: (RuleApplication, CardGenerator) -> Bool
 checkCardAndRuleMatch (ruleAppl, cardGen) =
@@ -124,25 +136,8 @@ maybeReplaceCardSide oldCardText replacement =
     else
         replacement
 
-applyExceptionToCard :: Exception -> Card -> Card
-applyExceptionToCard exception card =
-    card { cardFront = new_front, cardBack = new_back, exceptional = True }
-  where maybe_new_front = newFront exception
-        maybe_new_back = newBack exception
-        new_front = CardFront (requireWord $ maybeReplaceCardSide (unCardFront (cardFront card)) maybe_new_front)
-        new_back = CardBack (requireWord $ maybeReplaceCardSide (unCardBack (cardBack card)) maybe_new_back)
-
-
 exceptionMatchesSituation :: Card -> Exception -> Bool
 exceptionMatchesSituation card = (==) (cardSituationRef card) . situationRules
-
-applyExceptionToCardIfAny :: [Exception] -> Card -> Card
-applyExceptionToCardIfAny allExceptions card =
-    case maybe_exception of
-        Just exception -> applyExceptionToCard exception card
-        Nothing -> card
-  where maybe_exception = listToMaybe $ filter (exceptionMatchesSituation card) allExceptions
-
 
 filterCardGenByRule :: [RuleApplication] -> [CardGenerator] -> [CardGenerator]
 filterCardGenByRule ruleAppl cardGenerators =
@@ -150,20 +145,14 @@ filterCardGenByRule ruleAppl cardGenerators =
 
 applyCardGenerators :: [CardGenerator] -> [Example] -> [Card]
 applyCardGenerators cardgenerators examples =
-    finished_cards
+    filtered_cards
   where generated_cards = (map generator cardgenerators) <*> examples
         filtered_cards = catMaybes generated_cards
-        finished_cards = map (applyExceptionToCardIfAny (exceptions example)) generated_cards
-
-
-buildCard :: [Situation] -> [Rule] -> [Example] -> [Card]
-buildCard cardSituations cardRules =
-    applyCardGenerators $ concatMap (`buildCardGenerator` cardRules) cardSituations
-
+    
 -- go through each concept and create a list of cards
 getConceptCards :: Concept -> [Card]
---getConceptCards cardConcept | trace ("myfun " ++ show cardConcept) False = undefined
-getConceptCards cardConcept = buildCard (situations cardConcept) (rules cardConcept) (examples cardConcept)
+getConceptCards cardConcept = 
+    (applyCardGenerators $ concatMap (`buildCardGenerator` (rules cardConcept)) (situations cardConcept)) (examples cardConcept)
 
 
 getAllCards :: Book -> [Card]

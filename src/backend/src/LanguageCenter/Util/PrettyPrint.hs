@@ -1,11 +1,34 @@
 module LanguageCenter.Util.PrettyPrint 
 ( ppBook
-, ppExample)
+, ppExample
+, ppCard
+, printCard)
 where
-
 
 import LanguageCenter.Processor.Book
 import Text.PrettyPrint.HughesPJ
+
+-- todo: Delete this
+printCard :: Card -> String
+printCard card =
+    --unCardFront (cardFront card) ++ "    " ++ unCardBack (cardBack card) ++ "    " ++ unSituationRef (cardSituationRef card) ++ "-" ++ unRuleRef (cardRuleRef card) ++ "(" ++ (show $ exceptional card) ++ ")"
+    show $ ppCard card
+
+ppCard :: Card -> Doc
+ppCard card = 
+    if is_exceptional then
+        basic_card <+> parens (text "exception")
+    else
+        basic_card
+
+  where cardFront_text = text $ unCardFront (cardFront card)
+        cardBack_text = text $ unCardBack (cardBack card)
+        situationRef_text = text $ unSituationRef (cardSituationRef card)
+        ruleRef_text = text $ unRuleRef (cardRuleRef card)
+        is_exceptional = exceptional card
+        basic_card = cardFront_text <+> cardBack_text <+> situationRef_text <> colon <> ruleRef_text
+
+
 
 -- newtype WordRef = WordRef
 --     { unWordRef :: String } deriving (Show, Eq)

@@ -3,6 +3,50 @@ module LanguageCenter.Processor.Book where
 import Data.List
 import Control.Arrow
 
+class ContainsSituationRef a where
+    getSituationRef :: a -> SituationRef
+
+class ContainsRuleRef a where
+    getRuleRef :: a -> RuleRef
+
+
+newtype CardFront = CardFront
+    { unCardFront :: String } deriving (Show, Eq)
+
+newtype CardBack = CardBack
+    { unCardBack :: String } deriving (Show, Eq)
+
+-- todo add tags and stuff
+data Card = Card
+    { cardFront :: !CardFront
+    , cardBack :: !CardBack
+    , cardRuleRef :: !RuleRef
+    , cardSituationRef :: !SituationRef
+    , exceptional :: !Bool
+    } deriving (Show, Eq)
+
+instance ContainsRuleRef Card where
+    getRuleRef = cardRuleRef
+
+instance ContainsSituationRef Card where
+    getSituationRef = cardSituationRef
+
+data CardGenerator = CardGenerator
+    { generator :: Example -> Maybe Card
+    , cardGenRuleRef :: !RuleRef
+    , cardGenSituationRef :: !SituationRef
+    }
+
+instance Show CardGenerator where
+    show x = unRuleRef (cardGenRuleRef x) ++ unSituationRef (cardGenSituationRef x)
+
+instance ContainsRuleRef CardGenerator where
+    getRuleRef = cardGenRuleRef
+
+instance ContainsSituationRef CardGenerator where
+    getSituationRef = cardGenSituationRef
+
+
 newtype WordRef = WordRef
     { unWordRef :: String } deriving (Show, Eq)
 
@@ -29,16 +73,27 @@ data Exception = Exception
     , newBack :: !WordString
     } deriving (Show, Eq)
 
+instance ContainsSituationRef Exception where
+    getSituationRef = situationRules
+
 data RuleApplication = RuleApplication
     { raSituationRef :: !SituationRef
     , raRuleRef :: !RuleRef
     } deriving (Show, Eq)
+
+instance ContainsRuleRef RuleApplication where
+    getRuleRef = raRuleRef
+
+instance ContainsSituationRef RuleApplication where
+    getSituationRef = raSituationRef
 
 data Example = Example
     { wordSet :: ![WordInfo]
     , eRules :: ![RuleApplication]
     , exceptions :: ![Exception]
     } deriving (Show, Eq)
+
+
 
 
 {- BOOK -}
@@ -67,6 +122,9 @@ data Situation = Situation
     , front :: !CardFrontTemplateFun
     } deriving (Show, Eq)
 
+instance ContainsSituationRef Situation where
+    getSituationRef = situationName
+
 {-
 While rules may share ruleName's (that's how you group them!) and
 situationRef's, they shouldn't share both a ruleName and situationRef.
@@ -81,6 +139,13 @@ data Rule = Rule
     , situationRef :: !SituationRef
     , back :: !CardBackTemplateFun
     } deriving (Show, Eq)
+
+instance ContainsRuleRef Rule where
+    getRuleRef = ruleName
+
+instance ContainsSituationRef Rule where
+    getSituationRef = situationRef
+
 
 data Concept = Concept
     { concept :: !String

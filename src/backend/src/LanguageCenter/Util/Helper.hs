@@ -3,9 +3,11 @@ module LanguageCenter.Util.Helper
 , insertToValueList
 , checkEither
 , combinations
+, combineIfTrue
 ) where
 
 import qualified Data.Map as Map
+import Control.Applicative
 
 splitList :: [(a, [b])] -> ([a], [b])
 splitList list =
@@ -22,7 +24,14 @@ checkEither :: Either String t -> t
 checkEither (Left err) = error err
 checkEither (Right dataThing) = dataThing
 
+makeTuple :: a -> b -> (a, b)
+makeTuple a b = (a, b)
+
 combinations :: [a] -> [b] -> [(a, b)]
-combinations [] _ = []
-combinations _ [] = []
-combinations (a1:a_rest) b@(b1:b_rest) = (a1, b1):(combinations [a1] b_rest ++ combinations a_rest b)
+combinations as bs = makeTuple <$> as <*> bs
+
+combineIfTrue :: (a -> b -> Bool) -> [a] -> [b] -> [(a, b)]
+combineIfTrue func a b =
+	filter (uncurry func) $ combinations a b
+
+    

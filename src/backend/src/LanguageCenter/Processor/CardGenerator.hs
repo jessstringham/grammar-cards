@@ -10,6 +10,8 @@ import Data.Maybe
 
 import LanguageCenter.Processor.Book
 import LanguageCenter.Processor.Template
+import LanguageCenter.Util.Helper
+
 
 
 handleCardSide :: TemplateFun -> [WordInfo] -> String
@@ -17,6 +19,7 @@ handleCardSide TemplateUndefined _ = error "This side is undefined"
 handleCardSide DefaultTemplate _ = error "Not Implemented!"
 handleCardSide (Template template) wordinfo =
     functionFromExpr (parseRuleString template) wordinfo
+
 
 applyExceptionToCard :: Exception -> Card -> Card
 applyExceptionToCard exception card =
@@ -27,20 +30,10 @@ applyExceptionToCard exception card =
         new_back = CardBack (requireWord $ maybeReplaceCardSide (unCardBack (cardBack card)) maybe_new_back)
 
 
-compareSituationRef :: (ContainsSituationRef a) => (ContainsSituationRef b) => a -> b -> Bool
-compareSituationRef a1 a2 = getSituationRef a1 == getSituationRef a2
-
-compareRuleRef :: (ContainsRuleRef a) => (ContainsRuleRef b) => a -> b -> Bool
-compareRuleRef a1 a2 = getRuleRef a1 == getRuleRef a2
-
-
-checkCardAndRuleMatch' :: Rule -> Situation -> Example -> Bool
-checkCardAndRuleMatch' rule situation example =
+checkCardAndRuleMatch :: Situation -> Rule -> Example -> Bool
+checkCardAndRuleMatch situation rule example =
     any (\ruleAppl -> compareRuleRef rule ruleAppl
        && compareSituationRef situation ruleAppl ) $ eRules example
-
-exceptionMatchesSituation :: Card -> Exception -> Bool
-exceptionMatchesSituation card = (==) (cardSituationRef card) . situationRules
 
 
 cardGeneratorFunction :: Situation -> Rule -> Example -> Maybe Card
@@ -51,23 +44,14 @@ cardGeneratorFunction situation rule example =
             Nothing -> Just card
     else
         Nothing
-  where is_relevant = checkCardAndRuleMatch' rule situation example
+  where is_relevant = checkCardAndRuleMatch situation rule example
         card = Card
             { cardFront=CardFront (handleCardSide (unCardFrontTemplateFun (front situation)) (wordSet example))
             , cardBack=CardBack (handleCardSide (unCardBackTemplateFun (back rule)) (wordSet example))
-            , cardRuleRef=ruleName rule
-            , cardSituationRef=situationName situation
+            , cardRuleRef=getRuleRef rule
+            , cardSituationRef=getSituationRef situation
             , exceptional=False}
-        applicable_exception = listToMaybe $ filter (exceptionMatchesSituation card) (exceptions example)
-
-
-cardGeneratorGenerator :: Situation -> Rule -> CardGenerator
-cardGeneratorGenerator situation rule =
-    -- parse the sentences
-    CardGenerator
-        (cardGeneratorFunction situation rule)
-        (ruleName rule)
-        (situationName situation)
+        applicable_exception = listToMaybe $ filter (compareSituationRef card) (exceptions example)
 
 
 requireWord :: WordString -> String
@@ -89,27 +73,33 @@ maybeReplaceCardSide oldCardText replacement =
 
 applyCardGenerators :: [CardGenerator] -> [Example] -> [Card]
 applyCardGenerators cardgenerators wordexamples =
-    filtered_cards
-  where generated_cards = map generator cardgenerators <*> wordexamples
-        filtered_cards = catMaybes generated_cards
+    catMaybes $ map generator cardgenerators <*> wordexamples
 
 
-buildCardGenerator :: Situation -> [Rule] -> [CardGenerator]
-buildCardGenerator situation rawRules =
+cardGeneratorGenerator :: Situation -> Rule -> CardGenerator
+cardGeneratorGenerator situation rule =
+    -- parse the sentences
+    CardGenerator
+        (cardGeneratorFunction situation rule)
+        (ruleName rule)
+        (situationName situation)
+
+
+buildCardGenerators :: [Situation] -> [Rule] -> [CardGenerator]
+buildCardGenerators sits rawRules =
     -- filter out the rules we don't care about
     -- then create the card generators
-    map (cardGeneratorGenerator situation) filtered_rules
-  where filtered_rules = filter (compareSituationRef situation) rawRules
+    map 
+        (uncurry cardGeneratorGenerator)
+        (combineIfTrue compareSituationRef sits rawRules)
 
 
 -- go through each concept and create a list of cards
 getConceptCards :: Concept -> [Card]
 getConceptCards cardConcept = 
-    applyCardGenerators $ 
-        concatMap 
-            (`buildCardGenerator` rules cardConcept) (situations cardConcept)
-    $ examples cardConcept
-
+    (applyCardGenerators $ 
+        buildCardGenerators (situations cardConcept) (rules cardConcept))
+    (examples cardConcept)
 
 getAllCards :: Book -> [Card]
 getAllCards = concatMap getConceptCards

@@ -6,8 +6,14 @@ import Control.Arrow
 class ContainsSituationRef a where
     getSituationRef :: a -> SituationRef
 
+compareSituationRef :: (ContainsSituationRef a) => (ContainsSituationRef b) => a -> b -> Bool
+compareSituationRef a1 a2 = getSituationRef a1 == getSituationRef a2
+
 class ContainsRuleRef a where
     getRuleRef :: a -> RuleRef
+
+compareRuleRef :: (ContainsRuleRef a) => (ContainsRuleRef b) => a -> b -> Bool
+compareRuleRef a1 a2 = getRuleRef a1 == getRuleRef a2
 
 
 newtype CardFront = CardFront

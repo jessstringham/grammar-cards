@@ -24,6 +24,6 @@ main = do
 
     --print $ ppBook $ buildBook bookYaml wordsYaml
 
-    mapM_ (print . printCard) (getAllCards $ buildBook bookYaml wordsYaml)
+    mapM_ (\c -> print . show $ ppCard c) (getAllCards $ buildBook bookYaml wordsYaml)
 
     --print (buildBook bookYaml wordsYaml)

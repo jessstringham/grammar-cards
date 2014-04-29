@@ -2,7 +2,6 @@ module LanguageCenter.Util.PrettyPrint
 ( ppBook
 , ppExample
 , ppCard
-, printCard
 , ppRawTemplate
 , ppConceptTrait)
 where
@@ -10,11 +9,6 @@ where
 import LanguageCenter.Processor.Book
 import Text.PrettyPrint.HughesPJ
 
--- todo: Delete this
-printCard :: Card -> String
-printCard card =
-    --unCardFront (cardFront card) ++ "    " ++ unCardBack (cardBack card) ++ "    " ++ unSituationRef (cardSituationRef card) ++ "-" ++ unRuleRef (cardRuleRef card) ++ "(" ++ (show $ exceptional card) ++ ")"
-    show $ ppCard card
 
 ppCard :: Card -> Doc
 ppCard card = 

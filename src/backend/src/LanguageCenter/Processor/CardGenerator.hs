@@ -29,11 +29,11 @@ applyExceptionToCard exception card =
         new_front = CardFront (requireWord $ maybeReplaceCardSide (unCardFront (cardFront card)) maybe_new_front)
         new_back = CardBack (requireWord $ maybeReplaceCardSide (unCardBack (cardBack card)) maybe_new_back)
 
-
+-- check through the rule applicators for one that says we should make a card here.
 checkCardAndRuleMatch :: Situation -> Rule -> Example -> Bool
-checkCardAndRuleMatch situation rule example =
+checkCardAndRuleMatch situation rule ruleAppls =
     any (\ruleAppl -> compareRuleRef rule ruleAppl
-       && compareSituationRef situation ruleAppl ) $ eRules example
+       && compareSituationRef situation ruleAppl ) $ eRules ruleAppls
 
 
 cardGeneratorFunction :: Situation -> Rule -> Example -> Maybe Card
@@ -91,7 +91,10 @@ buildCardGenerators sits rawRules =
     -- then create the card generators
     map 
         (uncurry cardGeneratorGenerator)
-        (combineIfTrue compareSituationRef sits rawRules)
+        [(sit, rule) 
+        | sit <- sits
+        , rule <- rawRules 
+        , compareSituationRef sit rule]
 
 
 -- go through each concept and create a list of cards

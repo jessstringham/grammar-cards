@@ -18,7 +18,7 @@ handleCardSide :: TemplateFun -> [WordInfo] -> String
 handleCardSide TemplateUndefined _ = error "This side is undefined"
 handleCardSide DefaultTemplate _ = error "Not Implemented!"
 handleCardSide (Template template) wordinfo =
-    functionFromExpr (parseRuleString template) wordinfo
+    parseRuleString template wordinfo
 
 
 applyExceptionToCard :: Exception -> Card -> Card

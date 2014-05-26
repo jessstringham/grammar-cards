@@ -4,7 +4,6 @@
   - concept: Nouns
     wordlist: # each of these have an implicit translation value of _word
     - noun
-    conceptTrait: []
     situations:
     - situation: Translation # This is created by default if you use Translation concept trait, but you can also override it.
       front: <_noun>
@@ -47,7 +46,6 @@
     - verb1
     - verb2
     - rest
-    conceptTrait: []
     situations:
     - situation: Normal
       front: <_subject> <_verb1> <_verb2> <_rest>

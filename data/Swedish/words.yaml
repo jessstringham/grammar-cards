@@ -13,7 +13,6 @@
       rule: en
     - situation: Indefinite Plural
       rule: ar
-    exceptions: []
   - wordset:
     - name: noun
       word: bok
@@ -43,7 +42,6 @@
       rule: er/ar verbs
     - situation: Infinitive
       rule: ar verbs
-    exceptions: []
 - section: Sentences
   concept: Commands
   words:
@@ -65,4 +63,3 @@
       rule: DEFAULT
     - situation: Normal
       rule: DEFAULT
-    exceptions: []

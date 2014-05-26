@@ -57,7 +57,7 @@ instance FromJSON Concept where
     parseJSON (Object v) = Concept <$>
                          v  .: "concept" <*>
                          v  .: "wordlist" <*>
-                         v  .: "conceptTrait" <*>
+                         liftM (maybe [] id) (v  .:? "conceptTrait") <*>
                          v  .: "situations"
 
     parseJSON _          = mzero
@@ -132,7 +132,7 @@ instance FromJSON WordInfo where
     parseJSON (Object v) = WordInfo <$>
                          v  .: "wordset" <*>
                          v  .: "rules" <*>
-                         v  .: "exceptions"
+                         liftM (maybe [] id) (v  .:? "exceptions")
 
     parseJSON _          = mzero
 

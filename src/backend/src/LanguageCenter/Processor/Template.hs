@@ -51,7 +51,7 @@ removeCharacterFunction :: Char -> Bool -> String -> String
 removeCharacterFunction character is_optional accum
     | last accum == character = init accum
     | is_optional = accum
-    | otherwise = error $ "Requires " ++ pure character ++ ", got " ++ (pure $ last accum)
+    | otherwise = error $ "Requires " ++ pure character ++ ", got " ++ pure $ last accum
 
 
 matchMaybeChar :: [WordInfo] -> Parsec TextLazy.Text String (String -> String)
@@ -110,8 +110,7 @@ matchText wordinfo = do
 parseRuleString' :: [WordInfo] -> Parsec TextLazy.Text String String
 parseRuleString' wordinfo = do
     many1 $ choice (map try ([matchRemoveRule, matchWordText, matchText] <*> pure wordinfo)) -- matchRemoveRule
-    result <- getState
-    return result
+    getState
 
 
 parseRuleString :: RawTemplate -> [WordInfo] -> String
@@ -123,4 +122,4 @@ parseRuleString rawTemplate wordinfo =
 
 
 testParser = 
-    parseRuleString "test <hi>, <_hi>|a?hey|" [(WordInfo (WordRef "hi") (Word "bye") (Word "hey"))]
+    parseRuleString "test <hi>, <_hi>|a?hey|" [WordInfo (WordRef "hi") (Word "bye") (Word "hey")]

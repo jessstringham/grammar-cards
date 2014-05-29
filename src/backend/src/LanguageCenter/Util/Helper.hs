@@ -1,11 +1,9 @@
 module LanguageCenter.Util.Helper
 ( splitList
 , insertToValueList
-, checkEither
 ) where
 
-import qualified Data.Map as Map
-import Control.Applicative
+import qualified Data.Map as Map (Map, insert, lookup)
 
 splitList :: [(a, [b])] -> ([a], [b])
 splitList list =
@@ -17,7 +15,3 @@ insertToValueList key value mapList =
         (Nothing) -> Map.insert key value mapList
         (Just i)  -> Map.insert key (value ++ i) mapList
   where item = Map.lookup key mapList
-
-checkEither :: Either String t -> t
-checkEither (Left err) = error err
-checkEither (Right dataThing) = dataThing

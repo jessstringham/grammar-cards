@@ -15,9 +15,10 @@ module LanguageCenter.Reader.YamlBook
 , RuleApplication(..)
 ) where
 
-import Control.Monad
-import Control.Applicative
+import Control.Monad (mzero, liftM)
+import Control.Applicative ((<$>), (<*>))
 import Data.Yaml
+
 
 data Rule = Rule
     { ruleName :: !String

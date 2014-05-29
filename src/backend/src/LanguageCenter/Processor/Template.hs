@@ -2,28 +2,21 @@ module LanguageCenter.Processor.Template
 ( parseRuleString
 ) where
 
+import Control.Applicative ((<*>), pure)
+import qualified Data.Text.Lazy as TextLazy (Text, pack)
+
 import LanguageCenter.Processor.Book
 import Text.Parsec.Text.Lazy()
-import Text.Parsec.Combinator
-import Text.Parsec.Char
-import Text.Parsec
-import qualified Data.Text.Lazy as TextLazy
-
-import Control.Applicative
-
-extractWord :: WordString -> String
-extractWord (Word wordStringWord) = wordStringWord
-extractWord errorMessage = error "Undefined! " ++ show errorMessage
+import Text.Parsec (Parsec, ParsecT, Stream, anyChar, char, choice, eof, getState, lookAhead, many1, manyTill, optionMaybe, runParser, string, try, updateState)
 
 
-lookupWordSetWord :: [WordInfo] -> WordRef -> Bool -> String
-lookupWordSetWord ws name isTranslation =
-    extractWord
-        (if isTranslation then
-            translation word_set_word
-        else
-            word word_set_word)
-  where lookup_results = filter (\x -> name == wordName x) ws
+lookupWordSetWord :: [Translation] -> WordRef -> Bool -> String
+lookupWordSetWord translations name isTranslation =
+    if isTranslation then
+        translation word_set_word
+    else
+        word word_set_word
+  where lookup_results = filter (\x -> name == wordName x) translations
         word_set_word = case lookup_results of
                             [] -> error (unWordRef name ++ " translation is missing")
                             (a:_) -> a
@@ -43,7 +36,7 @@ removeCharacterFunction character is_optional accum
     | otherwise = error $ "Requires " ++ pure character ++ ", got " ++ pure (last accum)
 
 
-matchMaybeChar :: [WordInfo] -> Parsec TextLazy.Text String (String -> String)
+matchMaybeChar :: [Translation] -> Parsec TextLazy.Text String (String -> String)
 matchMaybeChar _ = do
     charValue <- anyChar
     optionalChar <- optionMaybe $ char '?'
@@ -55,10 +48,10 @@ matchMaybeChar _ = do
     return $ removeCharacterFunction charValue is_optional
 
 
-matchRemoveRule :: [WordInfo] -> Parsec TextLazy.Text String ()
-matchRemoveRule wordinfo = do
+matchRemoveRule :: [Translation] -> Parsec TextLazy.Text String ()
+matchRemoveRule translations = do
     _ <- char '|'
-    maybeCharsFunctions <- manyTill (matchMaybeChar wordinfo) (try (string "|"))
+    maybeCharsFunctions <- manyTill (matchMaybeChar translations) (try (string "|"))
 
     -- compose the functions and apply the result to the string
     updateState (foldr (.) id maybeCharsFunctions)
@@ -66,8 +59,8 @@ matchRemoveRule wordinfo = do
     return ()
 
 
-matchWordText :: [WordInfo] -> Parsec TextLazy.Text String ()
-matchWordText wordinfo = do
+matchWordText :: [Translation] -> Parsec TextLazy.Text String ()
+matchWordText translations = do
     _ <- char '<'
     translateToken <- optionMaybe $ char '_'
     wordText <- manyTill anyChar (try (char '>'))
@@ -76,12 +69,12 @@ matchWordText wordinfo = do
                             (Just _) -> True
                             (Nothing) -> False
 
-    updateState (++ lookupWordSetWord wordinfo (WordRef wordText) should_translate)
+    updateState (++ lookupWordSetWord translations (WordRef wordText) should_translate)
 
     return ()
 
 
-matchText :: [WordInfo] -> Parsec TextLazy.Text String ()
+matchText :: [Translation] -> Parsec TextLazy.Text String ()
 matchText _ = do
     allText <- many1till anyChar 
         (try 
@@ -94,19 +87,19 @@ matchText _ = do
     return ()
 
 
-parseRuleString' :: [WordInfo] -> Parsec TextLazy.Text String String
-parseRuleString' wordinfo = do
-    _ <- many1 $ choice (map try ([matchRemoveRule, matchWordText, matchText] <*> pure wordinfo)) -- matchRemoveRule
+parseRuleString' :: [Translation] -> Parsec TextLazy.Text String String
+parseRuleString' translations = do
+    _ <- many1 $ choice (map try ([matchRemoveRule, matchWordText, matchText] <*> pure translations))
     getState
 
 
-parseRuleString :: RawTemplate -> [WordInfo] -> String
-parseRuleString rawTemplate wordinfo = 
+parseRuleString :: RawTemplate -> [Translation] -> String
+parseRuleString rawTemplate translations = 
     case result of
         (Left a) -> error $ show a
         (Right a) -> a
-  where result = runParser (parseRuleString' wordinfo) "" rawTemplate $ TextLazy.pack rawTemplate
+  where result = runParser (parseRuleString' translations) "" rawTemplate $ TextLazy.pack rawTemplate
 
 testParser :: String
 testParser = 
-    parseRuleString "test <hi>, <_hi>|a?hey|" [WordInfo (WordRef "hi") (Word "bye") (Word "hey")]
+    parseRuleString "test <hi>, <_hi>|a?hey|" [Translation (WordRef "hi") "bye" "hey"]

@@ -1,8 +1,32 @@
-module LanguageCenter.Processor.Book where
+module LanguageCenter.Processor.Book
+( Book(..)
+, Concept(..)
+, Card(..)
+, CardBack(..)
+, CardBackTemplateFun(..)
+, CardFront(..)
+, CardFrontTemplateFun(..)
+, CardGenerator(..)
+, ConceptTrait(..)
+, Example(..)
+, Exception(..)
+, Rule(..)
+, RuleRef(..)
+, Situation(..)
+, SituationRef(..)
+, RawTemplate(..)
+, RuleApplication(..)
+, TemplateFun(..)
+, Translation(..)
+, WordRef(..)
+, compareSituationRef
+, compareRuleRef
+, emptyConcept
+, getRuleRef
+, getSituationRef )
+where
 
-import Data.List
-import Control.Arrow
-
+-- typeclasses
 class ContainsSituationRef a where
     getSituationRef :: a -> SituationRef
 
@@ -37,6 +61,7 @@ instance ContainsRuleRef Card where
 instance ContainsSituationRef Card where
     getSituationRef = cardSituationRef
 
+
 data CardGenerator = CardGenerator
     { generator :: Example -> Maybe Card
     , cardGenRuleRef :: !RuleRef
@@ -62,26 +87,25 @@ type RawTemplate = String
 
 data ConceptTrait = TranslateEachWord
 
--- Add default string here!
-data WordString = Word String | Undefined deriving (Show, Eq)
-
-data WordInfo = WordInfo
+data Translation = Translation
     { wordName :: !WordRef
-    , word :: !WordString
-    , translation :: !WordString
+    , word :: !String
+    , translation :: !String
     } deriving (Show, Eq)
 
 {- WORDS -}
 
 data Exception = Exception
     { situationRules :: !SituationRef
-    , newFront :: !WordString
-    , newBack :: !WordString
+    , newFront :: !String
+    , newBack :: !String
     } deriving (Show, Eq)
 
 instance ContainsSituationRef Exception where
     getSituationRef = situationRules
 
+
+-- In this situation, apply this rule
 data RuleApplication = RuleApplication
     { raSituationRef :: !SituationRef
     , raRuleRef :: !RuleRef
@@ -93,13 +117,12 @@ instance ContainsRuleRef RuleApplication where
 instance ContainsSituationRef RuleApplication where
     getSituationRef = raSituationRef
 
+
 data Example = Example
-    { wordSet :: ![WordInfo]
+    { translations :: ![Translation]
     , eRules :: ![RuleApplication]
     , exceptions :: ![Exception]
     } deriving (Show, Eq)
-
-
 
 
 {- BOOK -}
@@ -168,25 +191,6 @@ emptyConcept = Concept "" "" [] [] [] [] []
 
 type Book = [Concept]
 
-newWordSetFromStrings :: [String] -> [WordInfo]
-newWordSetFromStrings =
-    map (\n -> WordInfo (WordRef n) Undefined Undefined)
-
-checkForNoUndefined :: WordInfo -> Bool
-checkForNoUndefined wordInfo =
-    (word wordInfo /= Undefined) && (translation wordInfo /= Undefined)
-
-checkAllWordsForNoUndefined :: [WordInfo] -> Bool
-checkAllWordsForNoUndefined =
-    foldl (\x y -> x && checkForNoUndefined y) True
-
-
--- Returns True if all is well
-checkUniqueRules :: [Rule] -> Bool
-checkUniqueRules rulesToCheck =
-    id_list == nub id_list
-  where id_list = map (ruleName &&& situationRef) rulesToCheck
-
 
 main :: IO ()
 main =
@@ -199,6 +203,6 @@ main =
         , situations =
             [ Situation (SituationRef "TestSituation") (CardFrontTemplateFun (Template "<hi>|a|b|"))
             , Situation (SituationRef "TestSituation2") (CardFrontTemplateFun (Template "<_hi>|a|b|")) ] } in
-    let ruleResult = checkUniqueRules (rules concept1) in
-    print ruleResult
+
+    print concept1
     --putStrLn $ show concept1

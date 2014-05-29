@@ -2,10 +2,10 @@ module LanguageCenter.Reader.BookFromYaml
 ( buildBook
 ) where
 
-import qualified Data.Map as Map
+import qualified Data.Map as Map (empty, findWithDefault, Map)
 
 import LanguageCenter.Processor.Book
-import LanguageCenter.Util.Helper
+import LanguageCenter.Util.Helper (splitList, insertToValueList)
 import qualified LanguageCenter.Reader.YamlBook as Yaml
 
 {- Extraction:
@@ -54,20 +54,20 @@ extractException :: Yaml.Exception -> Exception
 extractException rawException =
     Exception exception_situation_ref new_front new_back
   where exception_situation_ref = SituationRef (Yaml.situationRef rawException)
-        new_front = Word $ Yaml.newFront rawException
-        new_back = Word $ Yaml.newBack rawException
+        new_front = Yaml.newFront rawException
+        new_back = Yaml.newBack rawException
 
 extractExceptions :: [Yaml.Exception] -> [Exception]
 extractExceptions = map extractException
 
-extractWord :: Yaml.Word -> WordInfo
+extractWord :: Yaml.Word -> Translation
 extractWord rawWord =
-    WordInfo word_label word_text word_translation
+    Translation word_label word_text word_translation
   where word_label = WordRef $ Yaml.label rawWord
-        word_text = Word $ Yaml.word rawWord
-        word_translation = Word $ Yaml.translation rawWord
+        word_text = Yaml.word rawWord
+        word_translation = Yaml.translation rawWord
 
-extractWordSet :: [Yaml.Word] -> [WordInfo]
+extractWordSet :: [Yaml.Word] -> [Translation]
 extractWordSet = map extractWord
 
 

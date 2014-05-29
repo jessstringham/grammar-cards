@@ -16,7 +16,6 @@ ppCard card =
         basic_card <+> parens (text "exception")
     else
         basic_card
-
   where cardFront_text = text $ unCardFront (cardFront card)
         cardBack_text = text $ unCardBack (cardBack card)
         situationRef_text = text $ unSituationRef (cardSituationRef card)
@@ -42,24 +41,18 @@ ppRawTemplate = text
 ppConceptTrait :: ConceptTrait -> Doc
 ppConceptTrait _ = text "Translate Each Word"
 
--- data WordString = Word String | Undefined deriving (Show, Eq)
-
-ppWordString :: WordString -> Doc
-ppWordString (Word ws) = text ws
-ppWordString (Undefined) = text "UNDEFINED"
-
--- data WordInfo = WordInfo
+-- data Translation = Translation
 --     { wordName :: !WordRef
 --     , word :: !WordString
 --     , translation :: !WordString
 --     } deriving (Show, Eq)
 
-ppWordInfo :: WordInfo -> Doc
-ppWordInfo wi = 
+ppTranslation :: Translation -> Doc
+ppTranslation wi = 
     wi_word_name <> colon <+> wi_word <+> parens wi_translation
   where wi_word_name = ppWordRef $ wordName wi
-        wi_word = ppWordString $ word wi
-        wi_translation = ppWordString $ translation wi
+        wi_word = text $ word wi
+        wi_translation = text $ translation wi
 
 
 -- newtype SituationRef = SituationRef
@@ -78,8 +71,8 @@ ppException :: Exception -> Doc
 ppException ex =
     pp_situation_rules <> colon <+> pp_new_front <+> parens pp_new_back
   where pp_situation_rules = ppSituationRef $ situationRules ex
-        pp_new_front = ppWordString $ newFront ex
-        pp_new_back = ppWordString $ newBack ex
+        pp_new_front = text $ newFront ex
+        pp_new_back = text $ newBack ex
 
 -- newtype RuleRef = RuleRef
 --     { unRuleRef :: String } deriving (Show, Eq)
@@ -100,7 +93,7 @@ ppRuleApplication ra =
 
 
 -- data Example = Example
---     { wordSet :: ![WordInfo]
+--     { translations :: ![Translation]
 --     , eRules :: ![RuleApplication]
 --     , exceptions :: ![Exception]
 --     } deriving (Show, Eq)
@@ -108,7 +101,7 @@ ppRuleApplication ra =
 ppExample :: Example -> Doc
 ppExample ex =
     text "Words: " $$ nest 4 pp_wordset $$ text "Rules: " $$ nest 4 pp_rule_application $$ text "Exceptions: " $$ nest 2 pp_exceptions
-  where pp_wordset = vcat $ map ppWordInfo (wordSet ex)
+  where pp_wordset = vcat $ map ppTranslation (translations ex)
         pp_rule_application = vcat $ map ppRuleApplication (eRules ex)
         pp_exceptions = vcat $ map ppException (exceptions ex)
 
@@ -200,12 +193,12 @@ testplace :: Doc
 testplace =
     ppBook sample_book
   where sample_wordref = WordRef "wordref"
-        sample_wordstring = Word "word"
-        sample_wordinfo = WordInfo sample_wordref sample_wordstring sample_wordstring
+        sample_wordstring = "word"
+        sample_wordinfo = Translation sample_wordref sample_wordstring sample_wordstring
         sample_ruleref = RuleRef "ruleref"
         sample_situationref = SituationRef "situationref"
         sample_ruleapplication = RuleApplication sample_situationref sample_ruleref
-        sample_exception = Exception sample_situationref (Word "front") (Word "back")
+        sample_exception = Exception sample_situationref "front" "back"
         sample_example = Example [sample_wordinfo, sample_wordinfo] [sample_ruleapplication, sample_ruleapplication] [sample_exception, sample_exception]
         sample_templatefun = Template "template -> fun"
         sample_cardfronttemplatefun = CardFrontTemplateFun $ Template "card_front_template"

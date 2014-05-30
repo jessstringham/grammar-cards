@@ -21,9 +21,9 @@
       front: (the <_noun>)
       rules:
       - rule: en
-        back: <noun>en # naive for now
+        back: <noun>|a?|en
       - rule: ett
-        back: <noun>ett
+        back: <noun>e/ae/a/t
     - situation: Indefinite Plural
       front: (several <_noun>)
       rules:
@@ -37,6 +37,61 @@
         back: <noun>n
       - rule: X
         back: <noun>
+    - situation: Definite Plural
+      front: (several <_noun>)
+      rules:
+      - rule: or
+        back: <noun>|a|orna
+      - rule: ar
+        back: <noun>arna
+      - rule: er
+        back: <noun>erna
+      - rule: -n
+        back: <noun>na
+      - rule: X
+        back: <noun>na
+    situation_templates: # these produce multiple cards. individual rules will overwrite these.
+    - name: first declension
+      cards:
+      - situation: Indefinite Article
+        rule: en
+      - situation: Definite Article
+        rule: en
+      - situation: Indefinite Plural
+        rule: or
+    - name: second declension
+      cards:
+      - situation: Indefinite Article
+        rule: en
+      - situation: Definite Article
+        rule: en
+      - situation: Indefinite Plural
+        rule: ar
+    - name: third declension
+      cards:
+      - situation: Indefinite Article
+        rule: en
+      - situation: Definite Article
+        rule: en
+      - situation: Indefinite Plural
+        rule: er
+    - name: fourth declension
+      cards:
+      - situation: Indefinite Article
+        rule: ett
+      - situation: Definite Article
+        rule: ett
+      - situation: Indefinite Plural
+        rule: -n
+    - name: fifth declension
+      cards:
+      - situation: Indefinite Article
+        rule: ett
+      - situation: Definite Article
+        rule: ett
+      - situation: Indefinite Plural
+        rule: X
+
 
 - section: Sentences
   concepts:
@@ -62,8 +117,6 @@
   - concept: Regular
     wordlist:
     - present_tense
-    conceptTrait:
-    - TranslateEachWord
     situations:
     - situation: Present Tense
       front: <_present_tense> (present tense)
@@ -83,8 +136,6 @@
       - rule: er verbs
         back: <present_tense>|er|a
   - concept: Irregular Verbs
-    conceptTrait:
-    - TranslateEachWord # Goes through each word in word list and creates seperate situations for each.
     wordlist:
     - infinitive
     - present_tense

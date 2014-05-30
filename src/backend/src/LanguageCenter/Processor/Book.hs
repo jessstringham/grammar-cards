@@ -7,7 +7,6 @@ module LanguageCenter.Processor.Book
 , CardFront(..)
 , CardFrontTemplateFun(..)
 , CardGenerator(..)
-, ConceptTrait(..)
 , Example(..)
 , Exception(..)
 , Rule(..)
@@ -16,6 +15,7 @@ module LanguageCenter.Processor.Book
 , SituationRef(..)
 , RawTemplate(..)
 , RuleApplication(..)
+, RuleTemplate(..)
 , TemplateFun(..)
 , Translation(..)
 , WordRef(..)
@@ -52,6 +52,7 @@ data Card = Card
     , cardBack :: !CardBack
     , cardRuleRef :: !RuleRef
     , cardSituationRef :: !SituationRef
+    , cardTags :: ![String]
     , exceptional :: !Bool
     } deriving (Show, Eq)
 
@@ -84,8 +85,6 @@ newtype WordRef = WordRef
 type RawTemplate = String
 
 {- SHARED -}
-
-data ConceptTrait = TranslateEachWord
 
 data Translation = Translation
     { wordName :: !WordRef
@@ -122,6 +121,7 @@ data Example = Example
     { translations :: ![Translation]
     , eRules :: ![RuleApplication]
     , exceptions :: ![Exception]
+    , eRuleTemplates :: ![String]
     } deriving (Show, Eq)
 
 
@@ -154,11 +154,6 @@ data Situation = Situation
 instance ContainsSituationRef Situation where
     getSituationRef = situationName
 
-{-
-While rules may share ruleName's (that's how you group them!) and
-situationRef's, they shouldn't share both a ruleName and situationRef.
--}
-
 
 newtype RuleRef = RuleRef
     { unRuleRef :: String } deriving (Show, Eq)
@@ -175,15 +170,20 @@ instance ContainsRuleRef Rule where
 instance ContainsSituationRef Rule where
     getSituationRef = situationRef
 
+data RuleTemplate = RuleTemplate
+    { ruleTemplateName :: !String
+    , ruleApplications :: ![RuleApplication] 
+    } deriving (Show, Eq)
+
 
 data Concept = Concept
     { concept :: !String
     , section :: !String
     , situations :: ![Situation]
     , rules :: ![Rule]
+    , ruleTemplates :: ![RuleTemplate]
     , requiredWords :: ![String]
     , examples :: ![Example]
-    , conceptTraits :: [String]
     } deriving (Show, Eq)
 
 emptyConcept :: Concept

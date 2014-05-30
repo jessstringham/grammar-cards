@@ -4,6 +4,7 @@ module LanguageCenter.Processor.Template
 
 import Control.Applicative ((<*>), pure)
 import qualified Data.Text.Lazy as TextLazy (Text, pack)
+import Data.List (isSuffixOf)
 
 import LanguageCenter.Processor.Book
 import Text.Parsec.Text.Lazy()
@@ -35,6 +36,14 @@ removeCharacterFunction character is_optional accum
     | is_optional = accum
     | otherwise = error $ "Requires " ++ pure character ++ ", got " ++ pure (last accum)
 
+replaceString :: String -> String -> String -> String
+replaceString removeThis replaceWithThis accum =
+    if isSuffixOf removeThis accum then
+        prefix ++ replaceWithThis
+    else
+        accum
+  where prefix_length = (length accum) - (length removeThis)
+        prefix = take prefix_length accum
 
 matchMaybeChar :: [Translation] -> Parsec TextLazy.Text String (String -> String)
 matchMaybeChar _ = do
@@ -58,6 +67,15 @@ matchRemoveRule translations = do
 
     return ()
 
+matchReplaceMultipleRule :: [Translation] -> Parsec TextLazy.Text String ()
+matchReplaceMultipleRule translations = do
+    _ <- char '/'
+    replaceThis <- manyTill anyChar (try (string "/"))
+    replaceWithThis <- manyTill anyChar (try (string "/"))
+
+    updateState (replaceString replaceThis replaceWithThis)
+
+    return ()    
 
 matchWordText :: [Translation] -> Parsec TextLazy.Text String ()
 matchWordText translations = do
@@ -81,15 +99,15 @@ matchText _ = do
             (lookAhead 
                 (choice [ string "|"
                         , string "<"
+                        , string "/"
                         , eof >> return ""
                         ])))
     updateState (++ allText)
     return ()
 
-
 parseRuleString' :: [Translation] -> Parsec TextLazy.Text String String
 parseRuleString' translations = do
-    _ <- many1 $ choice (map try ([matchRemoveRule, matchWordText, matchText] <*> pure translations))
+    _ <- many1 $ choice (map try ([matchReplaceMultipleRule, matchRemoveRule, matchWordText, matchText] <*> pure translations))
     getState
 
 

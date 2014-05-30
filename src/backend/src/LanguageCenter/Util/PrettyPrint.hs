@@ -2,13 +2,15 @@ module LanguageCenter.Util.PrettyPrint
 ( ppBook
 , ppExample
 , ppCard
-, ppRawTemplate
-, ppConceptTrait)
+, ppRawTemplate)
 where
 
 import LanguageCenter.Processor.Book
 import Text.PrettyPrint.HughesPJ
 
+
+removeSpaces :: String -> String
+removeSpaces input = [if l == ' ' then '_' else l | l <- input]
 
 ppCard :: Card -> Doc
 ppCard card = 
@@ -18,10 +20,11 @@ ppCard card =
         basic_card
   where cardFront_text = text $ unCardFront (cardFront card)
         cardBack_text = text $ unCardBack (cardBack card)
-        situationRef_text = text $ unSituationRef (cardSituationRef card)
-        ruleRef_text = text $ unRuleRef (cardRuleRef card)
+        situationRef_text = text $ removeSpaces $ unSituationRef (cardSituationRef card)
+        ruleRef_text = text $ removeSpaces $ unRuleRef (cardRuleRef card)
+        cardTags_text = foldr (<+>) empty (map (text . removeSpaces) (cardTags card))
         is_exceptional = exceptional card
-        basic_card = cardFront_text <+> cardBack_text <+> situationRef_text <> colon <> ruleRef_text
+        basic_card = cardFront_text <> char '\t' <> cardBack_text <> char '\t' <> situationRef_text <+> ruleRef_text <+> cardTags_text
 
 
 
@@ -35,11 +38,6 @@ ppWordRef wr = text (unWordRef wr)
 
 ppRawTemplate :: RawTemplate -> Doc
 ppRawTemplate = text
-
--- data ConceptTrait = TranslateEachWord
-
-ppConceptTrait :: ConceptTrait -> Doc
-ppConceptTrait _ = text "Translate Each Word"
 
 -- data Translation = Translation
 --     { wordName :: !WordRef
@@ -174,7 +172,6 @@ ppConcept con =
         $$ text "Rules:" $$ nest 4 pp_rules
         $$ text "Required Words:" $$ nest 4 pp_requiredwords
         $$ text "Examples:" $$ nest 4 pp_examples
-        $$ text "Concept Trait:" $$ nest 4 pp_concepttrait
         )
   where pp_concept = text $ concept con
         pp_section = text $ section con
@@ -182,7 +179,6 @@ ppConcept con =
         pp_rules = vcat $ map ppRule $ rules con
         pp_requiredwords = vcat $ map text $ requiredWords con
         pp_examples = vcat $ map (\c -> text "- " <> nest 4 (ppExample c)) $ examples con
-        pp_concepttrait = vcat $ map text $ conceptTraits con
 
 ppBook :: Book -> Doc
 ppBook book =
@@ -199,11 +195,12 @@ testplace =
         sample_situationref = SituationRef "situationref"
         sample_ruleapplication = RuleApplication sample_situationref sample_ruleref
         sample_exception = Exception sample_situationref "front" "back"
-        sample_example = Example [sample_wordinfo, sample_wordinfo] [sample_ruleapplication, sample_ruleapplication] [sample_exception, sample_exception]
+        sample_example = Example [sample_wordinfo, sample_wordinfo] [sample_ruleapplication, sample_ruleapplication] [sample_exception, sample_exception] ["Sample template"]
         sample_templatefun = Template "template -> fun"
         sample_cardfronttemplatefun = CardFrontTemplateFun $ Template "card_front_template"
         sample_cardbacktemplatefun = CardBackTemplateFun $ Template "card_back_template"
         sample_situation = Situation sample_situationref sample_cardfronttemplatefun
         sample_rule = Rule sample_ruleref sample_situationref sample_cardbacktemplatefun
-        sample_concept = Concept "concept" "section" [sample_situation] [sample_rule] ["requiredword"] [sample_example] ["concept trait"]
+        sample_rule_template = RuleTemplate "template name" [sample_ruleapplication]
+        sample_concept = Concept "concept" "section" [sample_situation] [sample_rule] [sample_rule_template] ["requiredword"] [sample_example]
         sample_book = [sample_concept, sample_concept]

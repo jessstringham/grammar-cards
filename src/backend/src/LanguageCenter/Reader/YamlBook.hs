@@ -8,11 +8,12 @@ module LanguageCenter.Reader.YamlBook
 , Book
 , Word(..)
 , Exception(..)
-, WordInfo(..)
+, Example(..)
 , Group(..)
 , Examples
 , FromJSON
 , RuleApplication(..)
+, RuleTemplate(..)
 ) where
 
 import Control.Monad (mzero, liftM)
@@ -28,6 +29,19 @@ instance FromJSON Rule where
     parseJSON (Object v) = Rule <$>
                          v  .: "rule" <*>
                          v  .: "back"
+
+    parseJSON _          = mzero
+
+
+data RuleTemplate = RuleTemplate
+    { situationTemplateRef :: !String
+    , cards :: ![RuleApplication]
+    } deriving (Show, Eq)
+
+instance FromJSON RuleTemplate where
+    parseJSON (Object v) = RuleTemplate <$>
+                         v  .: "name" <*>
+                         v  .: "cards"
 
     parseJSON _          = mzero
 
@@ -50,16 +64,16 @@ instance FromJSON Situation where
 data Concept = Concept
     { concept :: !String
     , wordlist :: ![String]
-    , conceptTraits :: ![String]
     , situations :: ![Situation]
+    , situationTemplates :: ![RuleTemplate]
     } deriving (Show, Eq)
 
 instance FromJSON Concept where
     parseJSON (Object v) = Concept <$>
                          v  .: "concept" <*>
                          v  .: "wordlist" <*>
-                         liftM (maybe [] id) (v  .:? "conceptTrait") <*>
-                         v  .: "situations"
+                         v  .: "situations" <*>
+                         liftM (maybe [] id) (v  .:? "situation_templates")
 
     parseJSON _          = mzero
 
@@ -122,17 +136,19 @@ instance FromJSON RuleApplication where
 
     parseJSON _          = mzero
 
--- WordInfo contains exceptions and info about them
-data WordInfo = WordInfo
-    { wordInfo :: ![Word]
+-- Example contains exceptions and info about them
+data Example = Example
+    { translations :: ![Word]
+    , ruleTemplates :: ![String]
     , ruleRefs :: ![RuleApplication]
     , exceptions :: ![Exception]
     } deriving (Show, Eq)
 
-instance FromJSON WordInfo where
-    parseJSON (Object v) = WordInfo <$>
+instance FromJSON Example where
+    parseJSON (Object v) = Example <$>
                          v  .: "wordset" <*>
-                         v  .: "rules" <*>
+                         liftM (maybe [] id) (v  .:? "ruleTemplates") <*>
+                         liftM (maybe [] id) (v  .:? "rules") <*>
                          liftM (maybe [] id) (v  .:? "exceptions")
 
     parseJSON _          = mzero
@@ -140,7 +156,7 @@ instance FromJSON WordInfo where
 data Group = Group
     { sectionRef :: !String
     , conceptRef :: !String
-    , wordsInfo :: ![WordInfo]
+    , examples :: ![Example]
     } deriving (Show, Eq)
 
 instance FromJSON Group where

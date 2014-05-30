@@ -65,6 +65,7 @@ cardGeneratorFunction situation rule example =
             , cardBack=CardBack (handleCardSide cardBack (translations example))
             , cardRuleRef=Book.getRuleRef rule
             , cardSituationRef=Book.getSituationRef situation
+            , cardTags=Book.eRuleTemplates example
             , exceptional=False}
         applicable_exception = listToMaybe $ filter (Book.compareSituationRef card) (exceptions example)
 

@@ -4,30 +4,50 @@
   words:
   - wordset:
     - name: noun
+      word: flaska
+      translation: bottle
+    ruleTemplates:
+    - first declension
+  - wordset:
+    - name: noun
+      word: stol
+      translation: chair
+    ruleTemplates:
+    - second declension
+  - wordset:
+    - name: noun
       word: bil
       translation: car
-    rules:
-    - situation: Indefinite Article
-      rule: en
-    - situation: Definite Article
-      rule: en
-    - situation: Indefinite Plural
-      rule: ar
+    ruleTemplates:
+    - second declension
   - wordset:
     - name: noun
       word: bok
       translation: book
-    rules:
-    - situation: Indefinite Article
-      rule: en
-    - situation: Definite Article
-      rule: en
-    - situation: Indefinite Plural
-      rule: ar
+    ruleTemplates:
+    - second declension
     exceptions:
     - situation: Indefinite Plural
       new_front: DEFAULT
       new_back: bocker
+  - wordset:
+    - name: noun
+      word: sak
+      translation: thing
+    ruleTemplates:
+    - third declension
+  - wordset:
+    - name: noun
+      word: hjärta
+      translation: heart
+    ruleTemplates:
+    - fourth declension
+  - wordset:
+    - name: noun
+      word: hus
+      translation: house
+    ruleTemplates:
+    - fifth declension
 - section: Verbs
   concept: Regular
   words:

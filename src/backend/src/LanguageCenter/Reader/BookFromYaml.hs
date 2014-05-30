@@ -19,6 +19,7 @@ extractRule ruleSituationName rawRule =
   where rule_name = RuleRef (Yaml.ruleName rawRule)
         card_back = CardBackTemplateFun (Template (Yaml.back rawRule))
 
+
 extractSituationRule :: Yaml.Situation -> (Situation, [Rule])
 extractSituationRule rawSituation =
     (Situation sitname card_front, yaml_rules)
@@ -26,26 +27,37 @@ extractSituationRule rawSituation =
         card_front = CardFrontTemplateFun (Template $ Yaml.front rawSituation)
         yaml_rules = map (extractRule sitname) (Yaml.rules rawSituation)
 
+
 extractSituationsRules :: Yaml.Concept -> ([Situation], [Rule])
 extractSituationsRules rawConcept =
     splitList situation_list
   where situation_list = map extractSituationRule $ Yaml.situations rawConcept
+
+
+extractRuleTemplate :: Yaml.RuleTemplate -> RuleTemplate
+extractRuleTemplate rule_template =
+    RuleTemplate rule_name rule_applications
+  where rule_name = Yaml.situationTemplateRef rule_template
+        rule_applications = map extractRuleApplication $ Yaml.cards rule_template
+
+
+extractRuleTemplates :: Yaml.Concept -> [RuleTemplate]
+extractRuleTemplates rawConcept =
+    map extractRuleTemplate $ Yaml.situationTemplates rawConcept
+        
 
 extractConcept :: String -> Yaml.Concept -> Concept
 extractConcept sectionName rawConcept =
     emptyConcept { section=sectionName
                  , concept=concept_name
                  , requiredWords=required_words
+                 , ruleTemplates=rule_templates
                  , situations=yaml_situations
-                 , rules=yaml_rules
-                 , conceptTraits=concept_traits}
+                 , rules=yaml_rules}
   where concept_name = Yaml.concept rawConcept
         (yaml_situations, yaml_rules) = extractSituationsRules rawConcept
+        rule_templates = extractRuleTemplates rawConcept
         required_words = extractRequiredWords rawConcept
-        concept_traits = getConceptTraits rawConcept
-
-getConceptTraits :: Yaml.Concept -> [String]
-getConceptTraits = Yaml.conceptTraits
 
 extractRequiredWords :: Yaml.Concept -> [String]
 extractRequiredWords = Yaml.wordlist
@@ -74,16 +86,17 @@ extractWordSet = map extractWord
 extractRuleApplication :: Yaml.RuleApplication -> RuleApplication
 extractRuleApplication c = RuleApplication (SituationRef $ Yaml.raSituationRef c) (RuleRef $ Yaml.raRuleRef c)
 
-extractExample :: Yaml.WordInfo -> Example
-extractExample rawWordInfo =
-    Example example_word_set example_rule_ref example_exceptions
-  where example_word_set = extractWordSet $ Yaml.wordInfo rawWordInfo
-        example_rule_ref = map extractRuleApplication $ Yaml.ruleRefs rawWordInfo
-        example_exceptions = extractExceptions $ Yaml.exceptions rawWordInfo
+extractExample :: Yaml.Example -> Example
+extractExample rawExample =
+    Example example_word_set example_rule_ref example_exceptions example_rule_templates
+  where example_word_set = extractWordSet $ Yaml.translations rawExample
+        example_rule_ref = map extractRuleApplication $ Yaml.ruleRefs rawExample
+        example_exceptions = extractExceptions $ Yaml.exceptions rawExample
+        example_rule_templates = Yaml.ruleTemplates rawExample
 
 extractExamples :: Yaml.Group -> [Example]
 extractExamples rawGroup =
-    map extractExample $ Yaml.wordsInfo rawGroup
+    map extractExample $ Yaml.examples rawGroup
 
 -- returns (section, concept) pair and a list of exceptions
 extractWordInfo :: Yaml.Group -> ((String, String), [Example])
@@ -103,28 +116,37 @@ extractExampleDict =
 -- We use this to help us carry around the examples
 type ExampleDict = Map.Map (String, String) [Example]
 
-updateWordList :: ExampleDict -> Concept -> Concept
---updateWordList ed ci | trace (show $ Map.keys ed) False = undefined
 
---("updating word " ++ show (map ppExample . concat . Map.elems $ ed)
+lookupTemplateRules :: [RuleTemplate] -> String -> [RuleApplication]
+lookupTemplateRules (r:otherRuleTemplates) templateName
+    | ruleTemplateName r == templateName = ruleApplications r
+    | otherwise = lookupTemplateRules otherRuleTemplates templateName
+lookupTemplateRules [] templateName = error ("Don't know about no " ++ templateName)
+
+
+updatedExampleWithConcept :: Concept -> Example -> Example
+updatedExampleWithConcept concept example =
+    example { eRules = new_rules }
+  where rule_templates = eRuleTemplates example -- we need to look these up
+        old_rules = eRules example
+        new_rules = old_rules ++ concatMap (lookupTemplateRules $ ruleTemplates concept) rule_templates
+
+
+updateWordList :: ExampleDict -> Concept -> Concept
 updateWordList exampleDict conceptInput =
-    conceptInput { examples = Map.findWithDefault [] (concept conceptInput, section conceptInput) exampleDict }
+    conceptInput { examples = processed_examples }
+  where relevant_examples = Map.findWithDefault [] (concept conceptInput, section conceptInput) exampleDict
+        processed_examples = map (updatedExampleWithConcept conceptInput) relevant_examples
+
 
 updateBookWithExamples :: ExampleDict -> Book -> Book
 updateBookWithExamples exampleDict =
     map (updateWordList exampleDict)
 
 
-
-
 buildSection :: Yaml.Section -> [Concept]
 buildSection rawSection =
     map (extractConcept $ Yaml.section rawSection) (Yaml.concepts rawSection)
-
-{- buildBook:
-    just call this one to get yo' book
--}
-
 
 buildBook :: Yaml.Book -> Yaml.Examples -> Book
 buildBook rawBook rawExample =

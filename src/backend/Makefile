@@ -1,9 +1,9 @@
 
 all:
-	ghc Main.hs
+	ghc GrammarCardsGenerator.hs
 
 picky:
-	ghc -Wall Main.hs
+	ghc -Wall GrammarCardsGenerator.hs
 
 hlint:
 	hlint *.hs ./GrammarCards/Reader/*.hs ./GrammarCards/Processor/*.hs ./GrammarCards/Util/*.hs
@@ -11,5 +11,5 @@ hlint:
 clean:
 	find . -name \*.o -delete
 	find . -name \*.hi -delete
-	rm -rf *.o *.hi Main
+	rm -rf *.o *.hi GrammarCardsGenerator
 

@@ -51,7 +51,7 @@ And the output looks something like
 (the chair)	stolen	Definite_Article en second_declension
 (the book)	boken	Definite_Article en second_declension
 (several chair)	stolar	Indefinite_Plural ar second_declension
-(several book)	bocker	Indefinite_Plural ar second_declension (exception)
+(several book)	böcker	Indefinite_Plural ar second_declension (exception)
 ```
 
 

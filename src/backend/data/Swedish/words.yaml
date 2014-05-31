@@ -29,7 +29,7 @@
     exceptions:
     - situation: Indefinite Plural
       new_front: DEFAULT
-      new_back: bocker
+      new_back: böcker
   - wordset:
     - name: noun
       word: sak

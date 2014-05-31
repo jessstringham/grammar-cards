@@ -127,7 +127,7 @@
       front: <_present_tense> (past tense)
       rules:
       - rule: er/ar verbs
-        back: <present_tense>|r?|de
+        back: <present_tense>/r//de
     - situation: Infinitive
       front: <_present_tense> (infinitive)
       rules:

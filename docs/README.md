@@ -46,6 +46,18 @@ program words.yaml grammarbook.yaml
 Where words.yaml is Example Yaml File, and grammarbook.yaml is a Grammar Book Yaml File
 
 
+File structure
+==============
+Data/
+  Swedish/
+    grammarbook.yaml
+    words.yaml
+  German/
+    grammarbook.yaml
+    words.yaml
+
+
+
 Grammar Book Yaml File
 ----------------------
 ```yaml
@@ -69,19 +81,83 @@ Grammar Book Yaml File
         back: ett <noun>
 ```
 
+Section
+-------
+
+| section | String | Name of the section (for organization). |
+| concepts | [Concept] | |
 
 
-Example Yaml File
+Concept
+-------
+
+| concept | String | Name |
+| wordlist | [String] | List of word slot names. See Template's <word> |
+| situations | [Situation] | |
+| situation_templates | [SituationTemplate] | |
+
+Situation
+---------
+
+| situation | String | |
+| front | Template | A template of the front of the card. Usually a translation. |
+| rules | [Rule] | A list of rules that address this situation. |
+
+Rule
+----
+| rule | String | |
+| back | Template | A template of the back of the card. Usually the word. |
+
+
+SituationTemplate
 -----------------
+
+| name | String | Name |
+| cards | [RuleApplication] | Examples with this situation template will have all of these rule applications. |
+
+
+Words Yaml
+==========
+
+List of examples
+
+Group
+-----
+
+| section | String | Name of section. Maps to grammarbook. |
+| concept | String | Name of concept. Maps to grammarbook. |
+| words | [Example] | |
+
+Example
+--------
+| translations | [Word] | |
+| rule | Name | Maps to a name of grammarbook's Rule |
+| ruleTemplates | [String] | Maps to a name of grammarbook's SituationTemplates |
+| exceptions | [Exception] | |
+
+Exception
+----------
+| situation | String | |
+| newFront | String | Use this for the front of the card. |
+| newBack | String | Use this for the back of the card. |
+
+Word
+----
+| label | String | Maps to entries in grammarbook's wordlist. |
+| word | String | The target-language string. |
+| translations | String | English string. |
+
 
 
 Templating System
 -----------------
 
-| Template  | Description  | Example                    |
-| --------- | ------------ | -------------------------- |
-| <word>    | word         | <heart> -> heart           |
-| <_word>   | translation  | <_heart> -> hjärta         |
-| /ae/a/    | replace      | <heart>e/ae/a/n -> hjärtan |
+| Template  | Description  | Example                     |
+| --------- | ------------ | --------------------------- |
+| <word>    | word         | <heart> -> hjärta           |
+| <_word>   | translation  | <_heart> -> heart           |
+| /ae/a/    | replace      | <_heart>e/ae/a/n -> hjärtan |
 
+
+<_heart>e/ae/a/n -> hjärtae/ae/a/n -> hjärtan
 

@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
--- This defines
+
 module LanguageCenter.Reader.YamlBook
 ( Rule(..)
 , Situation(..)

@@ -1,7 +1,0 @@
-situation: Indefinite Article
-front: (a <_noun>)
-rules:
-- rule: en
-  back: en <noun>
-- rule: ett
-  back: ett <noun>

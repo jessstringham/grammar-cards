@@ -21,14 +21,14 @@
       front: (the <_noun>)
       rules:
       - rule: en
-        back: <noun>|a?|en
+        back: <noun>/a//en
       - rule: ett
         back: <noun>e/ae/a/t
     - situation: Indefinite Plural
       front: (several <_noun>)
       rules:
       - rule: or
-        back: <noun>|a|or
+        back: <noun>/a//or
       - rule: ar
         back: <noun>ar
       - rule: er
@@ -41,7 +41,7 @@
       front: (several <_noun>)
       rules:
       - rule: or
-        back: <noun>|a|orna
+        back: <noun>/a//orna
       - rule: ar
         back: <noun>arna
       - rule: er
@@ -132,9 +132,9 @@
       front: <_present_tense> (infinitive)
       rules:
       - rule: ar verbs
-        back: <present_tense>|r|
+        back: <present_tense>/r//
       - rule: er verbs
-        back: <present_tense>|er|a
+        back: <present_tense>/er//a
   - concept: Irregular Verbs
     wordlist:
     - infinitive

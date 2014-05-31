@@ -30,12 +30,6 @@ many1till matchmany ending = do
     return $ fir:rest
 
 
-removeCharacterFunction :: Char -> Bool -> String -> String
-removeCharacterFunction character is_optional accum
-    | last accum == character = init accum
-    | is_optional = accum
-    | otherwise = error $ "Requires " ++ pure character ++ ", got " ++ pure (last accum)
-
 replaceString :: String -> String -> String -> String
 replaceString removeThis replaceWithThis accum =
     if isSuffixOf removeThis accum then
@@ -44,28 +38,6 @@ replaceString removeThis replaceWithThis accum =
         accum
   where prefix_length = (length accum) - (length removeThis)
         prefix = take prefix_length accum
-
-matchMaybeChar :: [Translation] -> Parsec TextLazy.Text String (String -> String)
-matchMaybeChar _ = do
-    charValue <- anyChar
-    optionalChar <- optionMaybe $ char '?'
-
-    let is_optional = case optionalChar of
-                            (Just _) -> True
-                            (Nothing) -> False
-
-    return $ removeCharacterFunction charValue is_optional
-
-
-matchRemoveRule :: [Translation] -> Parsec TextLazy.Text String ()
-matchRemoveRule translations = do
-    _ <- char '|'
-    maybeCharsFunctions <- manyTill (matchMaybeChar translations) (try (string "|"))
-
-    -- compose the functions and apply the result to the string
-    updateState (foldr (.) id maybeCharsFunctions)
-
-    return ()
 
 matchReplaceMultipleRule :: [Translation] -> Parsec TextLazy.Text String ()
 matchReplaceMultipleRule translations = do
@@ -107,7 +79,7 @@ matchText _ = do
 
 parseRuleString' :: [Translation] -> Parsec TextLazy.Text String String
 parseRuleString' translations = do
-    _ <- many1 $ choice (map try ([matchReplaceMultipleRule, matchRemoveRule, matchWordText, matchText] <*> pure translations))
+    _ <- many1 $ choice (map try ([matchReplaceMultipleRule, matchWordText, matchText] <*> pure translations))
     getState
 
 

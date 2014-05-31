@@ -1,4 +1,4 @@
-module LanguageCenter.Processor.Book
+module GrammarCards.Processor.Book
 ( Book(..)
 , Concept(..)
 , Card(..)

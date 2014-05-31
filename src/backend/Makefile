@@ -1,12 +1,12 @@
 
 all:
-	ghc src/Main.hs
+	ghc Main.hs
 
 picky:
 	ghc -Wall Main.hs
 
 hlint:
-	hlint *.hs ./LanguageCenter/Reader/*.hs ./LanguageCenter/Processor/*.hs ./LanguageCenter/Util/*.hs
+	hlint *.hs ./GrammarCards/Reader/*.hs ./GrammarCards/Processor/*.hs ./GrammarCards/Util/*.hs
 
 clean:
 	find . -name \*.o -delete

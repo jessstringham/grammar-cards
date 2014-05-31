@@ -1,4 +1,4 @@
-module LanguageCenter.Processor.CardGenerator
+module GrammarCards.Processor.CardGenerator
 ( getAllCards
 , getConceptCards
 , applyCardGenerators
@@ -8,9 +8,9 @@ module LanguageCenter.Processor.CardGenerator
 import Control.Applicative ((<*>))
 import Data.Maybe (listToMaybe, catMaybes)
 
-import LanguageCenter.Processor.Book as Book
-import LanguageCenter.Processor.Template
-import LanguageCenter.Util.Helper
+import GrammarCards.Processor.Book as Book
+import GrammarCards.Processor.Template
+import GrammarCards.Util.Helper
 
 
 

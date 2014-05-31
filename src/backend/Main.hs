@@ -2,10 +2,10 @@ import qualified Data.ByteString.Char8 as BS (readFile)
 import Data.Yaml (decodeEither)
 import System.Environment (getArgs)
 
-import LanguageCenter.Reader.BookFromYaml (buildBook)
-import qualified LanguageCenter.Reader.YamlBook as Yaml (Book, Examples)
-import LanguageCenter.Processor.CardGenerator (getAllCards)
-import LanguageCenter.Util.PrettyPrint (ppCard, ppBook)
+import GrammarCards.Reader.BookFromYaml (buildBook)
+import qualified GrammarCards.Reader.YamlBook as Yaml (Book, Examples)
+import GrammarCards.Processor.CardGenerator (getAllCards)
+import GrammarCards.Util.PrettyPrint (ppCard, ppBook)
 
 uneither = either error id
 

@@ -1,4 +1,4 @@
-module LanguageCenter.Util.Helper
+module GrammarCards.Util.Helper
 ( splitList
 , insertToValueList
 ) where

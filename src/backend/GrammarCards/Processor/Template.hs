@@ -1,4 +1,4 @@
-module LanguageCenter.Processor.Template
+module GrammarCards.Processor.Template
 ( parseRuleString
 ) where
 
@@ -6,7 +6,7 @@ import Control.Applicative ((<*>), pure)
 import qualified Data.Text.Lazy as TextLazy (Text, pack)
 import Data.List (isSuffixOf)
 
-import LanguageCenter.Processor.Book
+import GrammarCards.Processor.Book
 import Text.Parsec.Text.Lazy()
 import Text.Parsec (Parsec, ParsecT, Stream, anyChar, char, choice, eof, getState, lookAhead, many1, manyTill, optionMaybe, runParser, string, try, updateState)
 

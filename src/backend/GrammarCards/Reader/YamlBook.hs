@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module LanguageCenter.Reader.YamlBook
+module GrammarCards.Reader.YamlBook
 ( Rule(..)
 , Situation(..)
 , Concept(..)

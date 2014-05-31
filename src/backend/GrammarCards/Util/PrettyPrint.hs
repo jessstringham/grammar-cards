@@ -1,11 +1,11 @@
-module LanguageCenter.Util.PrettyPrint 
+module GrammarCards.Util.PrettyPrint 
 ( ppBook
 , ppExample
 , ppCard
 , ppRawTemplate)
 where
 
-import LanguageCenter.Processor.Book
+import GrammarCards.Processor.Book
 import Text.PrettyPrint.HughesPJ
 
 

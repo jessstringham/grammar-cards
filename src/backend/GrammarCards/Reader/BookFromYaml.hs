@@ -1,12 +1,12 @@
-module LanguageCenter.Reader.BookFromYaml
+module GrammarCards.Reader.BookFromYaml
 ( buildBook
 ) where
 
 import qualified Data.Map as Map (empty, findWithDefault, Map)
 
-import LanguageCenter.Processor.Book
-import LanguageCenter.Util.Helper (splitList, insertToValueList)
-import qualified LanguageCenter.Reader.YamlBook as Yaml
+import GrammarCards.Processor.Book
+import GrammarCards.Util.Helper (splitList, insertToValueList)
+import qualified GrammarCards.Reader.YamlBook as Yaml
 
 {- Extraction:
     These take in info, the Yaml.*, and returns the *,

@@ -19,7 +19,7 @@ module GrammarCards.Reader.YamlBook
 import Control.Monad (mzero, liftM)
 import Control.Applicative ((<$>), (<*>))
 import Data.Yaml
-
+import Data.Maybe (fromMaybe)
 
 data Rule = Rule
     { ruleName :: !String
@@ -73,7 +73,7 @@ instance FromJSON Concept where
                          v  .: "concept" <*>
                          v  .: "wordlist" <*>
                          v  .: "situations" <*>
-                         liftM (maybe [] id) (v  .:? "situation_templates")
+                         liftM (fromMaybe []) (v  .:? "situation_templates")
 
     parseJSON _          = mzero
 
@@ -147,9 +147,9 @@ data Example = Example
 instance FromJSON Example where
     parseJSON (Object v) = Example <$>
                          v  .: "wordset" <*>
-                         liftM (maybe [] id) (v  .:? "ruleTemplates") <*>
-                         liftM (maybe [] id) (v  .:? "rules") <*>
-                         liftM (maybe [] id) (v  .:? "exceptions")
+                         liftM (fromMaybe []) (v  .:? "ruleTemplates") <*>
+                         liftM (fromMaybe []) (v  .:? "rules") <*>
+                         liftM (fromMaybe []) (v  .:? "exceptions")
 
     parseJSON _          = mzero
 

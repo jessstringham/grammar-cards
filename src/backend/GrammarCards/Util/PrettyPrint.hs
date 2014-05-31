@@ -22,7 +22,7 @@ ppCard card =
         cardBack_text = text $ unCardBack (cardBack card)
         situationRef_text = text $ removeSpaces $ unSituationRef (cardSituationRef card)
         ruleRef_text = text $ removeSpaces $ unRuleRef (cardRuleRef card)
-        cardTags_text = foldr (<+>) empty (map (text . removeSpaces) (cardTags card))
+        cardTags_text = foldr ((<+>) . text . removeSpaces) empty (cardTags card)
         is_exceptional = exceptional card
         basic_card = cardFront_text <> char '\t' <> cardBack_text <> char '\t' <> situationRef_text <+> ruleRef_text <+> cardTags_text
 
@@ -185,8 +185,8 @@ ppBook book =
     vcat (map (\b -> text "-" $$ nest 2 (ppConcept b) ) book)
 
 
-testplace :: Doc
-testplace =
+testpp :: Doc
+testpp =
     ppBook sample_book
   where sample_wordref = WordRef "wordref"
         sample_wordstring = "word"

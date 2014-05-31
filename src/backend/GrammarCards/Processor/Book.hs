@@ -1,5 +1,5 @@
 module GrammarCards.Processor.Book
-( Book(..)
+( Book
 , Concept(..)
 , Card(..)
 , CardBack(..)
@@ -9,13 +9,13 @@ module GrammarCards.Processor.Book
 , CardGenerator(..)
 , Example(..)
 , Exception(..)
+, RawTemplate
 , Rule(..)
 , RuleRef(..)
-, Situation(..)
-, SituationRef(..)
-, RawTemplate(..)
 , RuleApplication(..)
 , RuleTemplate(..)
+, Situation(..)
+, SituationRef(..)
 , TemplateFun(..)
 , Translation(..)
 , WordRef(..)

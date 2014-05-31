@@ -58,8 +58,8 @@ cardGeneratorFunction situation rule example =
     else
         Nothing
   where is_relevant = checkCardAndRuleMatch situation rule example
-        cardFront = (unCardFrontTemplateFun (front situation))
-        cardBack = (unCardBackTemplateFun (back rule))
+        cardFront = unCardFrontTemplateFun (front situation)
+        cardBack = unCardBackTemplateFun (back rule)
         card = Card
             { cardFront=CardFront (handleCardSide cardFront (translations example))
             , cardBack=CardBack (handleCardSide cardBack (translations example))
@@ -100,7 +100,7 @@ buildCardGenerators concept =
 -- go through each concept and create a list of cards
 getConceptCards :: Book.Concept -> [Book.Card]
 getConceptCards cardConcept = 
-    (applyCardGenerators $ cardGenerators) (Book.examples cardConcept)
+    applyCardGenerators cardGenerators (Book.examples cardConcept)
   where cardGenerators = buildCardGenerators cardConcept
 
 getAllCards :: Book.Book -> [Book.Card]

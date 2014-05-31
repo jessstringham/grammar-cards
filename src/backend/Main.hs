@@ -5,8 +5,9 @@ import System.Environment (getArgs)
 import GrammarCards.Reader.BookFromYaml (buildBook)
 import qualified GrammarCards.Reader.YamlBook as Yaml (Book, Examples)
 import GrammarCards.Processor.CardGenerator (getAllCards)
-import GrammarCards.Util.PrettyPrint (ppCard, ppBook)
+import GrammarCards.Util.PrettyPrint (ppCard)
 
+uneither :: Either [Char] c -> c
 uneither = either error id
 
 main :: IO ()

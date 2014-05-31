@@ -32,11 +32,11 @@ many1till matchmany ending = do
 
 replaceString :: String -> String -> String -> String
 replaceString removeThis replaceWithThis accum =
-    if isSuffixOf removeThis accum then
+    if removeThis `isSuffixOf` accum then
         prefix ++ replaceWithThis
     else
         accum
-  where prefix_length = (length accum) - (length removeThis)
+  where prefix_length = length accum - length removeThis
         prefix = take prefix_length accum
 
 matchReplaceMultipleRule :: [Translation] -> Parsec TextLazy.Text String ()
